@@ -262,7 +262,7 @@ class _PostState extends State<Post> {
                                                             });
                                                             widget.title = postTitleCtr.text;
                                                             widget.description = descCtr.text;
-                                                          };
+                                                          }
                                                           setState(() {
                                                             editing = !editing;
                                                           });
@@ -422,7 +422,7 @@ class _PostState extends State<Post> {
                             //
                             // )
                             
-                            ?(commentErrorMsg.isEmpty) ? SizedBox(height: 40): Column(
+                            (commentErrorMsg.isEmpty) ? SizedBox(height: 40): Column(
                               children: [
                                 SizedBox(height: 20),
                                 Text(commentErrorMsg),

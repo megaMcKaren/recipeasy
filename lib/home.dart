@@ -5,7 +5,6 @@ import 'profile/profile.dart';
 import 'post.dart';
 import 'sign_in.dart';
 import 'create.dart';
-import 'main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen>  with RouteAware {
     });
   }
 
+  @override
   void initState() {
     super.initState();
     print("INITIALIZED AGAIN FOR HOME.DART");

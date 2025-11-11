@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:social_media_app/profile/profile.dart';
 import '../firestore_utils.dart';
 import 'follow_list.dart';
 
