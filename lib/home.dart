@@ -203,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen>  with RouteAware {
                       return Post(
                         postID: data['id'],
                         title: data['title'],
-                        imageUrl: data['url'],
+                        imageUrl: (data['url'] == "") ? "" : data['url'],
 
                         description: data['description'],
 

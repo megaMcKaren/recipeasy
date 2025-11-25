@@ -3,13 +3,17 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // import 'package:socialmediaapp/home.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'components/custom_button.dart';
+import 'components/widget_tile.dart';
 import 'home.dart';
+import 'widget_selection.dart';
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -19,15 +23,34 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
+
+
   final db = FirebaseFirestore.instance;
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
 
+  List<WidgetTile> addedWidgets = [];
+
   String postTitle = "";
   XFile? imageFile;
   ImagePicker imagePicker = ImagePicker();
   String imageUrl = "";
+
+  void deleteAddedWidget(int index) {
+    addedWidgets.removeAt(index);
+  }
+
+  void returnUpdatedWidgets() async{ // called when Add Widgets + is pressed
+    print("Test add widget");
+    final widgets = await Navigator.push(context, MaterialPageRoute(builder: (context) => WidgetSelector(startingCart: addedWidgets, delete: deleteAddedWidget)));
+    setState(() {
+      addedWidgets = widgets;
+    });
+    setState(() {
+    });
+  }
+
   void pickImg() async {
     try {
       var pickedImg = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -95,7 +118,7 @@ class _CreatePageState extends State<CreatePage> {
       final postData = <String, dynamic>{
         "dateCreated": DateTime.now(),
         "title": titleController.text,
-        "url": await uploadImgToDb(imageFile!),
+        "url": (true) ? "" : await uploadImgToDb(imageFile!),
         "userID": FirebaseAuth.instance.currentUser!.uid,
         "description": descriptionController.text,
         "likes": 0,
@@ -118,67 +141,101 @@ class _CreatePageState extends State<CreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    // final titleController = TextEditingController(text: widget.title);
+    // final descriptionController = TextEditingController(text: widget.desc);
     titleController.addListener(() {
       setState(() {
         postTitle = titleController.text;
       });
     });
     return Material(
-      child: Container(
-          child: ListView(children: [
-            ElevatedButton(
-              child: const Text("go back"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 340,
-              child: TextField(
-                controller: titleController,
-                onChanged: (input) {
-                  setState(() {});
-                },
-                textAlign: TextAlign.center,
-                decoration: const InputDecoration(
-                  hintText: "Post Title",
+      color: Color(0xFFEEEEFF),
+      child: SingleChildScrollView(
+        child: Column(children: [
+              SizedBox(height: 87.5),
+              Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 15, top: 15),
+                      child: CustomButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          width: 40,
+                          height: 30,
+                          text: SizedBox(),
+                          icon: Icon(Icons.arrow_back, size: 23),
+                          backgroundColor: Color(0xFFE0E0FF),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: SizedBox(
+                      width: 260,
+                      child: TextField(
+                        controller: titleController,
+                        onChanged: (input) {
+                          setState(() {});
+                        },
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.habibi(fontSize: 21),
+                        decoration: const InputDecoration(
+
+                          hintText: "Recipe Name",
+                        ),
+                      ),
+                    ),
+                  ),
+                ]
+              ),
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: 330,
+                child: TextField(
+                  controller: descriptionController,
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  style: GoogleFonts.aBeeZee(fontSize: 13),
+                  decoration: const InputDecoration(
+                    hintText: "Enter description",
+                    border: OutlineInputBorder(),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 340,
-              child: TextField(
-                controller: descriptionController,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: "Enter description",
-                  border: OutlineInputBorder(),
-                ),
+
+              Container(
+                  decoration: BoxDecoration(color: Color(0x11111111)),
+                  height: 480,
+                  child: ListView.builder(
+                    itemCount: addedWidgets.length,
+                    itemBuilder: (context, index) {
+                      print("$addedWidgets + $index vexillology");
+                      return addedWidgets[index];
+
+                    }
+                  ),
               ),
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                pickImg();
-                print("pick");
-              },
-              child: (imageFile == null)
-                  ? Container(
-                  width: 340,
-                  height: 340,
-                  color: Color(0xffb4b4b4),
-                  child: Icon(
-                    size: 67,
-                    Icons.add_circle,
-                    color: Colors.white,
-                  ))
-                  : Image.file(File(imageFile!.path)),
-            ),
-            ElevatedButton(
-                onPressed: (postTitle != "" && !(imageFile == null))
+
+              SizedBox(height: 20),
+
+              CustomButton(
+                onPressed: returnUpdatedWidgets,
+                width: 230,
+                height: 40,
+                text: Text("Add Widgets", style: GoogleFonts.robotoFlex(fontSize: 20, fontWeight: FontWeight.w600)),
+                icon: Icon(Icons.add),
+                backgroundColor: Color(0xFFE0E0FF),
+
+              ),
+
+              SizedBox(height: 20),
+
+              CustomButton(
+                onPressed: (postTitle != "")
                     ? () {
                   CreatePost(HomeScreen());
                   // Navigator.pushAndRemoveUntil(
@@ -188,8 +245,16 @@ class _CreatePageState extends State<CreatePage> {
                   // );
                 }
                     : null,
-                child: Text("Create post"))
-          ])),
-    );
+                width: 230,
+                height: 40,
+                text: Text("Upload Recipe", style: GoogleFonts.robotoFlex(fontSize: 20, fontWeight: FontWeight.w600)), //Text(text, style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none))
+                icon: Icon(Icons.upload_file),
+                backgroundColor: Color(0xFFE0E0FF),
+
+              ),
+
+            ]),
+      ));
+
   }
 }

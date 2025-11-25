@@ -170,7 +170,7 @@ class _PostState extends State<Post> {
 
   void updateLikesData() async {
 
-    final List<dynamic> docData = await getComments();
+    // final List<dynamic> docData = await getComments();
     await docRef.update({
       "likes": FieldValue.increment(1),
     });
@@ -179,7 +179,7 @@ class _PostState extends State<Post> {
 
   void updateDislikesData() async {
 
-    final List<dynamic> docData = await getComments();
+    // final List<dynamic> docData = await getComments();
     await docRef.update({
       "dislikes": FieldValue.increment(1),
     });
@@ -200,7 +200,7 @@ class _PostState extends State<Post> {
               //   ListTile(title: Text("Haaa")),
               // ])),
               child: Container(
-                decoration: BoxDecoration(color: Color(0xFFF6DAD8), border: Border(top: BorderSide(color: (!widget.showComments)?Colors.black:Colors.transparent, width: 3))),
+                decoration: BoxDecoration(color: Color(0xFFF6DAD8), border: Border(top: BorderSide(color: (!widget.showComments)?Colors.black:Colors.transparent, width: 2.1))),
                 // color: Color(0xfff6dad8),
                 child: Center(
                   child: Column(
@@ -212,10 +212,21 @@ class _PostState extends State<Post> {
                               child: Column(
                                 children: [
                                   SizedBox(height: 15),
-                                  (!editing) ? Text(
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600, fontSize: 25),
-                                      widget.title) : SizedBox(
+                                  (!editing) ? GestureDetector(
+                                    onTap: () async {
+                                      if (!widget.showComments) {
+                                        var result = await Navigator.push(context, MaterialPageRoute(builder: (_) => PostWrapper(postID: widget.postID, title: widget.title, imageUrl: widget.imageUrl, description: widget.description, userID: widget.userID,)));
+                                        if (result == 'refresh') {
+                                          print("did it work");
+                                          widget.onBack();
+                                        }
+                                      }
+                                    },
+                                    child: Text(
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600, fontSize: 25),
+                                        widget.title),
+                                  ) : SizedBox(
                                         width: 350,
                                         child: TextField(
                                           controller: postTitleCtr,
@@ -272,15 +283,16 @@ class _PostState extends State<Post> {
                                                         },
                                                          width: 300,
                                                          height: 60,
-                                                         text: (!editing) ? "Edit Post" : "Save Changes",
-                                                         icon: (!editing) ? Icons.edit : Icons.save,
+                                                         text: Text((!editing) ? "Edit Post" : "Save Changes", style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none)),
+                                                         icon: Icon((!editing) ? Icons.edit : Icons.save, size: 50),
+
                                                        ),
                                                        ?(editing) ? CustomButton(
                                                            onPressed: () {setState(() {editing = !editing;}); Navigator.of(context).pop();},
                                                            width: 300,
                                                            height: 60,
-                                                           text: "Discard Changes",
-                                                           icon: Icons.no_adult_content,
+                                                           text: Text("Discard Changes", style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none)),
+                                                           icon: Icon(Icons.no_adult_content, size: 50),
                                                        ) : null,
                                                        CustomButton(
                                                          onPressed: () {
@@ -294,8 +306,8 @@ class _PostState extends State<Post> {
                                                          },
                                                          width: 300,
                                                          height: 60,
-                                                         text: "Delete Post",
-                                                         icon: Icons.delete,
+                                                         text: Text("Delete Post", style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none)),
+                                                         icon: Icon(Icons.delete, size: 50),
                                                    ),
                                                ],
                                           )));
@@ -312,8 +324,8 @@ class _PostState extends State<Post> {
 
                         SizedBox(height: 5),
 
-                        (!editing) ? Text(widget.description) : SizedBox(
-                          width: 400,
+                        (!editing) ? Padding(padding: EdgeInsets.only(left: 20, right: 20), child: Text(widget.description)) : SizedBox(
+                          width: 350,
                           child: TextField(
                             controller: descCtr,
                             textAlign: TextAlign.center,
@@ -325,11 +337,9 @@ class _PostState extends State<Post> {
                           ),
                         ),
 
-                        SizedBox(height: 10),
+                        SizedBox(height: 13),
 
                         ProfilePicWidget(picSize: 15, textSize: 15, isCol: true, userID: widget.userID), // Profile Picture of Post Creator
-
-                        SizedBox(height: 10),
 
                         GestureDetector(onTap: () async {
                           if (!widget.showComments) {
@@ -340,9 +350,9 @@ class _PostState extends State<Post> {
                             }
                           }
 
-                        },child: Image.network(widget.imageUrl)), // If viewing from outside the post...
+                        },child: (widget.imageUrl.isNotEmpty) ? Padding(padding: EdgeInsets.all(25), child: Container(decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(25)), child: Image.network(widget.imageUrl))) : SizedBox(height: 15)), // If viewing from outside the post...
 
-                        SizedBox(height: 10),
+
 
                         FutureBuilder(
                           future: getData(),
@@ -363,34 +373,37 @@ class _PostState extends State<Post> {
                             if (data == null || data.length == 0) {
                               return Center(child: Text("No data found."));
                             }
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(data["likes"].toString()),
-                                // Icon(Icons.thumb_up, color: Colors.black, size: 25),
-                                IconButton(
-                                  onPressed: () {updateLikesData();},
-                                  icon: const Icon(Icons.thumb_up),
-                                  color: Colors.black,
-                                  iconSize: 24,
-                                ),
+                            return Container(
+                              color: Color(0xFFFFFAFA),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(style: GoogleFonts.robotoMono(fontSize: 20, fontWeight: FontWeight.w600), data["likes"].toString()),
+                                  // Icon(Icons.thumb_up, color: Colors.black, size: 25),
+                                  IconButton(
+                                    onPressed: () {updateLikesData();},
+                                    icon: const Icon(Icons.thumb_up),
+                                    color: Colors.black,
+                                    iconSize: 24,
+                                  ),
 
 
 
-                                SizedBox(width: 60),
-                                Text(data["dislikes"].toString()),
-                                IconButton(
-                                  onPressed: () {updateDislikesData();},
-                                  icon: const Icon(Icons.thumb_down),
-                                  color: Colors.black,
-                                  iconSize: 24,
-                                ),
-                              ],
+                                  SizedBox(width: 30),
+                                  Text(style: GoogleFonts.robotoMono(fontSize: 20, fontWeight: FontWeight.w600), data["dislikes"].toString()),
+                                  IconButton(
+                                    onPressed: () {updateDislikesData();},
+                                    icon: const Icon(Icons.thumb_down),
+                                    color: Colors.black,
+                                    iconSize: 24,
+                                  ),
+                                ],
+                              ),
                             );
                           }
                         ), // Likes Section
 
-                        SizedBox(height: 10),
+                        SizedBox(height: 15),
 
                         (widget.showComments) ?Column( // i changed it from lsitview
                           children: [
