@@ -42,6 +42,20 @@ class FirestoreUtils {
     }
   }
 
+  static void updatePostData(dynamic newData, String postId, String fieldName,) async {
+    try {
+      final postSnap = _db.collection('posts').doc(postId);
+
+      // if (!userSnap.exists) return null;
+      // return userSnap.data();
+      postSnap.update(newData);
+
+    } catch (e) {
+      print('Error fetching user: $e');
+      return null;
+    }
+  }
+
 
 
   static void updateUserData(dynamic newData, String userId, String fieldName, {bool addArray = false,bool removeArray = false}) async {

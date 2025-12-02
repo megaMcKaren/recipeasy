@@ -38,7 +38,17 @@ class _CreatePageState extends State<CreatePage> {
   String imageUrl = "";
 
   void deleteAddedWidget(int index) {
+    print("$index AH");
+
     addedWidgets.removeAt(index);
+    setState(() {
+
+    });
+    for (int i = index; i<addedWidgets.length; i++) {
+      print(i);
+      addedWidgets[i].index -= 1;
+    }
+    setState(() { });
   }
 
   void returnUpdatedWidgets() async{ // called when Add Widgets + is pressed
@@ -51,21 +61,7 @@ class _CreatePageState extends State<CreatePage> {
     });
   }
 
-  void pickImg() async {
-    try {
-      var pickedImg = await imagePicker.pickImage(source: ImageSource.gallery);
 
-      if (pickedImg != null) {
-        // uploadImgToDb(pickedImg);
-
-        setState((){
-          imageFile = pickedImg;
-        });
-      }
-    } catch (error) {
-      print("pickImg: $error");
-    }
-  }
 
   Future<String> uploadImgToDb(XFile file) async {
     try {
@@ -205,21 +201,19 @@ class _CreatePageState extends State<CreatePage> {
                     border: OutlineInputBorder(),
                   ),
                 ),
+              ), // TextField for Description
+
+              ListView.builder(
+                  padding: EdgeInsets.zero, // <_+AYH_)IHpode
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: addedWidgets.length,
+                  itemBuilder: (context, index) {
+                    print("$addedWidgets + $index vexillology");
+                    return addedWidgets[index];
+
+                  }
               ),
-
-              Container(
-                  decoration: BoxDecoration(color: Color(0x11111111)),
-                  height: 480,
-                  child: ListView.builder(
-                    itemCount: addedWidgets.length,
-                    itemBuilder: (context, index) {
-                      print("$addedWidgets + $index vexillology");
-                      return addedWidgets[index];
-
-                    }
-                  ),
-              ),
-
               SizedBox(height: 20),
 
               CustomButton(
@@ -252,6 +246,8 @@ class _CreatePageState extends State<CreatePage> {
                 backgroundColor: Color(0xFFE0E0FF),
 
               ),
+
+              SizedBox(height: 15),
 
             ]),
       ));

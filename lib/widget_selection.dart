@@ -46,7 +46,7 @@ class _WidgetSelectorState extends State<WidgetSelector> {
 
                   CartItem(
                     onPressed: () {
-                      cart.add(WidgetTile(type: WidgetTileType.imagePicker,  delete: widget.delete, index: cart.length));
+                      cart.add(WidgetTile(type: WidgetTileType.imagePicker,  delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.imagePicker, "url": ""}));
                       print(cart);
                     },
                     itemName: "Image Picker",
@@ -64,8 +64,8 @@ class _WidgetSelectorState extends State<WidgetSelector> {
 
                   CartItem(
                       onPressed: () {
-                        cart.add(WidgetTile(type: WidgetTileType.ingredientsList, delete: widget.delete, index: cart.length)); // enum
-                        print(cart);
+                        cart.add(WidgetTile(type: WidgetTileType.ingredientsList, delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.ingredientsList, "list": [],})); // enum
+                        print("$cart <-- a list.");
                       },
                       itemName: "Ingredients List",
                       width: 375,
