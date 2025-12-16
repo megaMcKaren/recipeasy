@@ -202,295 +202,454 @@ class _PostState extends State<Post> {
               child: Container(
                 decoration: BoxDecoration(color: Color(0xFFF6DAD8), border: Border(top: BorderSide(color: (!widget.showComments)?Colors.black:Colors.transparent, width: 2.1))),
                 // color: Color(0xfff6dad8),
-                child: Center(
-                  child: Column(
-                      children: [
+                child: FutureBuilder(
+                  future: FirestoreUtils.fetchPostData(widget.postID),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot
+                          .error}'));
+                    }
 
-                        Stack(
-                          children: [
-                            Center(
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 15),
-                                  (!editing) ? GestureDetector(
-                                    onTap: () async {
-                                      if (!widget.showComments) {
-                                        var result = await Navigator.push(context, MaterialPageRoute(builder: (_) => PostWrapper(postID: widget.postID, title: widget.title, imageUrl: widget.imageUrl, description: widget.description, userID: widget.userID,)));
-                                        if (result == 'refresh') {
-                                          print("did it work");
-                                          widget.onBack();
+
+                    final data = snapshot.data;
+                    if (data == null || data.isEmpty) {
+                      return Center(child: Text("No data found."));
+                    }
+                    return Column(
+                        children: [
+                          Stack(
+                            children: [
+                              Center(
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 15),
+                                    (!editing) ? GestureDetector(
+                                      onTap: () async {
+                                        if (!widget.showComments) {
+                                          var result = await Navigator.push(
+                                              context, MaterialPageRoute(
+                                              builder: (_) =>
+                                                  PostWrapper(
+                                                    postID: widget.postID,
+                                                    title: widget.title,
+                                                    imageUrl: widget.imageUrl,
+                                                    description: widget
+                                                        .description,
+                                                    userID: widget.userID,)));
+                                          if (result == 'refresh') {
+                                            print("did it work");
+                                            widget.onBack();
+                                          }
                                         }
-                                      }
-                                    },
-                                    child: Text(
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600, fontSize: 25),
-                                        widget.title),
-                                  ) : SizedBox(
-                                        width: 350,
-                                        child: TextField(
-                                          controller: postTitleCtr,
-                                          textAlign: TextAlign.center,
-                                          decoration: const InputDecoration(
-                                            hintText: "Enter new title",
-                                          ),
+                                      },
+                                      child: Text(
                                           style: TextStyle(
-                                              fontWeight: FontWeight.w600, fontSize: 25),
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 25),
+                                          widget.title),
+                                    ) : SizedBox(
+                                      width: 350,
+                                      child: TextField(
+                                        controller: postTitleCtr,
+                                        textAlign: TextAlign.center,
+                                        decoration: const InputDecoration(
+                                          hintText: "Enter new title",
                                         ),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 25),
                                       ),
-                                ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            if (widget.userID == FirebaseAuth.instance.currentUser?.uid && widget.showComments) Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
+                              if (widget.userID ==
+                                  FirebaseAuth.instance.currentUser?.uid &&
+                                  widget.showComments) Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
                                     onPressed: () {
                                       print("You pressed 3 dots in post.");
                                       showGeneralDialog(
-                                        context: context,
+                                          context: context,
                                           barrierDismissible: true,
                                           barrierLabel: "Dismiss",
-                                        pageBuilder: (context, anim1, anim2) {
-                                          return Align(
-                                            alignment: AlignmentGeometry.center,
-                                            child: Container(
-                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50),color: Color(0xFFBB5555)),
-                                                width: 375,
-                                                height: 270,
-                                                child: Column(
-                                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                                                       CustomButton(
-                                                         onPressed: () async {
-                                                          print("Edit/stop editing this post?");
-                                                          if (editing) {
-                                                            await db
-                                                                .collection("posts")
-                                                                .doc(widget.postID)
-                                                                .update({
-                                                              'title': postTitleCtr.text,
-                                                              'description': descCtr.text,
+                                          pageBuilder: (context, anim1, anim2) {
+                                            return Align(
+                                                alignment: AlignmentGeometry
+                                                    .center,
+                                                child: Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius
+                                                            .circular(50),
+                                                        color: Color(
+                                                            0xFFBB5555)),
+                                                    width: 375,
+                                                    height: 270,
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment
+                                                          .spaceEvenly,
+                                                      children: [
+                                                        CustomButton(
+                                                          onPressed: () async {
+                                                            print(
+                                                                "Edit/stop editing this post?");
+                                                            if (editing) {
+                                                              await db
+                                                                  .collection(
+                                                                  "posts")
+                                                                  .doc(
+                                                                  widget.postID)
+                                                                  .update({
+                                                                'title': postTitleCtr
+                                                                    .text,
+                                                                'description': descCtr
+                                                                    .text,
+                                                              });
+                                                              widget.title =
+                                                                  postTitleCtr
+                                                                      .text;
+                                                              widget
+                                                                  .description =
+                                                                  descCtr.text;
+                                                            }
+                                                            setState(() {
+                                                              editing =
+                                                              !editing;
                                                             });
-                                                            widget.title = postTitleCtr.text;
-                                                            widget.description = descCtr.text;
-                                                          }
-                                                          setState(() {
-                                                            editing = !editing;
-                                                          });
-                                                          print(widget.title);
-                                                          Navigator.of(context).pop();
+                                                            print(widget.title);
+                                                            Navigator.of(
+                                                                context).pop();
+                                                          },
+                                                          width: 300,
+                                                          height: 60,
+                                                          text: Text((!editing)
+                                                              ? "Edit Post"
+                                                              : "Save Changes",
+                                                              style: GoogleFonts
+                                                                  .robotoFlex(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 30,
+                                                                  decoration: TextDecoration
+                                                                      .none)),
+                                                          icon: Icon(
+                                                              (!editing) ? Icons
+                                                                  .edit : Icons
+                                                                  .save,
+                                                              size: 50),
 
-                                                        },
-                                                         width: 300,
-                                                         height: 60,
-                                                         text: Text((!editing) ? "Edit Post" : "Save Changes", style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none)),
-                                                         icon: Icon((!editing) ? Icons.edit : Icons.save, size: 50),
-
-                                                       ),
-                                                       ?(editing) ? CustomButton(
-                                                           onPressed: () {setState(() {editing = !editing;}); Navigator.of(context).pop();},
-                                                           width: 300,
-                                                           height: 60,
-                                                           text: Text("Discard Changes", style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none)),
-                                                           icon: Icon(Icons.no_adult_content, size: 50),
-                                                       ) : null,
-                                                       CustomButton(
-                                                         onPressed: () {
-                                                           print("Delete this post?");
-                                                           FirestoreUtils.deletePost(widget.postID);
-                                                           Navigator.pushAndRemoveUntil(
-                                                             context,
-                                                             MaterialPageRoute(builder: (_) => const HomeScreen()),
-                                                                 (route) => false,
-                                                           );
-                                                         },
-                                                         width: 300,
-                                                         height: 60,
-                                                         text: Text("Delete Post", style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none)),
-                                                         icon: Icon(Icons.delete, size: 50),
-                                                   ),
-                                               ],
-                                          )));
-                                        }
+                                                        ),
+                                                        ?(editing)
+                                                            ? CustomButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              editing =
+                                                              !editing;
+                                                            });
+                                                            Navigator.of(
+                                                                context).pop();
+                                                          },
+                                                          width: 300,
+                                                          height: 60,
+                                                          text: Text(
+                                                              "Discard Changes",
+                                                              style: GoogleFonts
+                                                                  .robotoFlex(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 30,
+                                                                  decoration: TextDecoration
+                                                                      .none)),
+                                                          icon: Icon(Icons
+                                                              .no_adult_content,
+                                                              size: 50),
+                                                        )
+                                                            : null,
+                                                        CustomButton(
+                                                          onPressed: () {
+                                                            print(
+                                                                "Delete this post?");
+                                                            FirestoreUtils
+                                                                .deletePost(
+                                                                widget.postID);
+                                                            Navigator
+                                                                .pushAndRemoveUntil(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (
+                                                                      _) => const HomeScreen()),
+                                                                  (
+                                                                  route) => false,
+                                                            );
+                                                          },
+                                                          width: 300,
+                                                          height: 60,
+                                                          text: Text(
+                                                              "Delete Post",
+                                                              style: GoogleFonts
+                                                                  .robotoFlex(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 30,
+                                                                  decoration: TextDecoration
+                                                                      .none)),
+                                                          icon: Icon(
+                                                              Icons.delete,
+                                                              size: 50),
+                                                        ),
+                                                      ],
+                                                    )));
+                                          }
                                       );
-                                      },
+                                    },
                                     icon: Icon(Icons.more_vert),
                                     iconSize: 30,
-                                                              ),
-                              ],
-                            ) else SizedBox(),
-                          ],
-                        ), // Stack for Post Title & Edit Btn.
-
-                        SizedBox(height: 5),
-
-                        (!editing) ? Padding(padding: EdgeInsets.only(left: 20, right: 20), child: Text(widget.description)) : SizedBox(
-                          width: 350,
-                          child: TextField(
-                            controller: descCtr,
-                            textAlign: TextAlign.center,
-                            decoration: const InputDecoration(
-                              hintText: "Enter new description",
-                            ),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 15),
-                          ),
-                        ),
-
-                        SizedBox(height: 13),
-
-                        ProfilePicWidget(picSize: 15, textSize: 15, isCol: true, userID: widget.userID), // Profile Picture of Post Creator
-
-                        GestureDetector(onTap: () async {
-                          if (!widget.showComments) {
-                            var result = await Navigator.push(context, MaterialPageRoute(builder: (_) => PostWrapper(postID: widget.postID, title: widget.title, imageUrl: widget.imageUrl, description: widget.description, userID: widget.userID,)));
-                            if (result == 'refresh') {
-                              print("did it work");
-                              widget.onBack();
-                            }
-                          }
-
-                        },child: (widget.imageUrl.isNotEmpty) ? Padding(padding: EdgeInsets.all(25), child: Container(decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(25)), child: Image.network(widget.imageUrl))) : SizedBox(height: 15)), // If viewing from outside the post...
-
-
-
-                        FutureBuilder(
-                          future: getData(),
-                          builder: (context, snapshot) {
-                            // print(widget.showComments);
-
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Error: ${snapshot.error}'));
-                            }
-
-
-
-                            final data = snapshot.data;
-                            if (data == null || data.length == 0) {
-                              return Center(child: Text("No data found."));
-                            }
-                            return Container(
-                              color: Color(0xFFFFFAFA),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(style: GoogleFonts.robotoMono(fontSize: 20, fontWeight: FontWeight.w600), data["likes"].toString()),
-                                  // Icon(Icons.thumb_up, color: Colors.black, size: 25),
-                                  IconButton(
-                                    onPressed: () {updateLikesData();},
-                                    icon: const Icon(Icons.thumb_up),
-                                    color: Colors.black,
-                                    iconSize: 24,
-                                  ),
-
-
-
-                                  SizedBox(width: 30),
-                                  Text(style: GoogleFonts.robotoMono(fontSize: 20, fontWeight: FontWeight.w600), data["dislikes"].toString()),
-                                  IconButton(
-                                    onPressed: () {updateDislikesData();},
-                                    icon: const Icon(Icons.thumb_down),
-                                    color: Colors.black,
-                                    iconSize: 24,
                                   ),
                                 ],
+                              ) else
+                                SizedBox(),
+                            ],
+                          ),
+                          // Stack for Post Title & Edit Btn.
+
+                          SizedBox(height: 5),
+
+                          (!editing) ? Padding(
+                              padding: EdgeInsets.only(left: 20, right: 20),
+                              child: Text(widget.description)) : SizedBox(
+                            width: 350,
+                            child: TextField(
+                              controller: descCtr,
+                              textAlign: TextAlign.center,
+                              decoration: const InputDecoration(
+                                hintText: "Enter new description",
                               ),
-                            );
-                          }
-                        ), // Likes Section
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 15),
+                            ),
+                          ),
 
-                        SizedBox(height: 15),
+                          SizedBox(height: 13),
 
-                        (widget.showComments) ?Column( // i changed it from lsitview
-                          children: [
-                            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          ProfilePicWidget(picSize: 15,
+                              textSize: 15,
+                              isCol: true,
+                              userID: widget.userID),
+                          // Profile Picture of Post Creator
 
-                              SizedBox(
-                                width: 250,
-                                child: TextField(
-                                  decoration: const InputDecoration(
-                                    hintText: "Enter a comment",
-                                  ),
-                                  controller: commentController,
+                          GestureDetector(onTap: () async {
+                            if (!widget.showComments) {
+                              var result = await Navigator.push(
+                                  context, MaterialPageRoute(builder: (_) =>
+                                  PostWrapper(postID: widget.postID,
+                                    title: widget.title,
+                                    imageUrl: widget.imageUrl,
+                                    description: widget.description,
+                                    userID: widget.userID,)));
+                              if (result == 'refresh') {
+                                print("did it work");
+                                widget.onBack();
+                              }
+                            }
+                          },
+                              child: (widget.imageUrl.isNotEmpty)
+                                  ? Padding(padding: EdgeInsets.all(25),
+                                  child: Container(decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(25)),
+                                      child: Image.network(widget.imageUrl)))
+                                  : SizedBox(height: 15)),
+                          // If viewing from outside the post...
 
-                                ),
+
+                          (widget.showComments) ? Column(
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: data["widgets"].length,
+                                itemBuilder: (context, index) {
+                                  if (data["widgets"][index]["type"] == "ingredientsList") {
+                                    return Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: Container(
+                                        decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(20),
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
+                                            itemCount: data["widgets"][index]["list"].length,
+                                            itemBuilder: (context, index2) {
+                                              return Align(alignment: Alignment.topLeft, child: Text("• ${data["widgets"][index]["list"][index2]}"));
+                                            }
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  } else if (data["widgets"][index]["type"] == "imagePicker") {
+                                    return Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.network(fit: BoxFit.cover, width: double.infinity, data["widgets"][index]["imageUrl"])),
+                                    );
+                                  }
+                                  return Align(alignment: Alignment.center, child: Text("Test"));
+                                }
                               ),
-                              SizedBox(width: 10),
-                              CustomButton(
-                                  onPressed: () {
-                                    updateCommentData(commentController.text);
-                                  },
-                                  width: 100,
-                                  height: 35,
-                                  text: '',
-                                  icon: null,
-                                  customChild: Center(child: Text("Comment", style: GoogleFonts.robotoMono())),
-                              ),
-                            ]),
-                            // ListView(
-                            //
-                            // )
-                            
-                            (commentErrorMsg.isEmpty) ? SizedBox(height: 40): Column(
+                            ],
+                          ): SizedBox(),
+
+
+                          Container(
+                            color: Color(0xFFFFFAFA),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(height: 20),
-                                Text(commentErrorMsg),
+                                Text(style: GoogleFonts.robotoMono(fontSize: 20,fontWeight: FontWeight.w600),data["likes"].toString()),
+                                // Icon(Icons.thumb_up, color: Colors.black, size: 25),
+                                IconButton(
+                                  onPressed: () {
+                                    updateLikesData();
+                                  },
+                                  icon: const Icon(Icons.thumb_up),
+                                  color: Colors.black,
+                                  iconSize: 24,
+                                ),
 
+
+                                SizedBox(width: 30),
+                                Text(style: GoogleFonts.robotoMono(fontSize: 20,fontWeight: FontWeight.w600),data["dislikes"].toString()),
+                                IconButton(
+                                  onPressed: () {
+                                    updateDislikesData();
+                                  },
+                                  icon: const Icon(Icons.thumb_down),
+                                  color: Colors.black,
+                                  iconSize: 24,
+                                ),
                               ],
                             ),
-                            
-                            FutureBuilder<dynamic>(
-                                future: getComments(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    return Center(child: Text('Error: ${snapshot.error}'));
-                                  }
+                          ),
+                          // Likes Section
+
+                          SizedBox(height: 15),
+
+                          (widget.showComments)
+                              ? Column( // i changed it from lsitview
+                            children: [
+                              Row(mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+
+                                    SizedBox(
+                                      width: 250,
+                                      child: TextField(
+                                        decoration: const InputDecoration(
+                                          hintText: "Enter a comment",
+                                        ),
+                                        controller: commentController,
+
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    CustomButton(
+                                      onPressed: () {
+                                        updateCommentData(
+                                            commentController.text);
+                                      },
+                                      width: 100,
+                                      height: 35,
+                                      text: '',
+                                      icon: null,
+                                      customChild: Center(child: Text("Comment",
+                                          style: GoogleFonts.robotoMono())),
+                                    ),
+                                  ]),
+                              // ListView(
+                              //
+                              // )
+
+                              (commentErrorMsg.isEmpty)
+                                  ? SizedBox(height: 40)
+                                  : Column(
+                                children: [
+                                  SizedBox(height: 20),
+                                  Text(commentErrorMsg),
+
+                                ],
+                              ),
+
+                              FutureBuilder<dynamic>(
+                                  future: getComments(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Center(child: Text(
+                                          'Error: ${snapshot.error}'));
+                                    }
 
 
+                                    final comments = snapshot.data;
+                                    if (comments == null ||
+                                        comments.length == 0) {
+                                      return Center(child: Text(
+                                          "Be the first one to say something!",
+                                          style: GoogleFonts.mcLaren()));
+                                    }
 
-                                  final comments = snapshot.data;
-                                  if (comments == null || comments.length == 0) {
-                                    return Center(child: Text("Be the first one to say something!", style: GoogleFonts.mcLaren()));
-                                  }
+                                    return SizedBox(height: comments.length *
+                                        100.0, child: ListView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: comments.length,
+                                      itemBuilder: (context, index) {
+                                        final doc = comments[index];
 
-                                  return SizedBox(height: comments.length * 100.0, child: ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: comments.length,
-                                    itemBuilder: (context, index) {
-                                      final doc = comments[index];
+                                        print(doc);
 
-                                      print(doc);
-
-                                      return SizedBox(
-                                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                        return SizedBox(
+                                          child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment
+                                                  .start, children: [
                                             CommentWidget(comment: doc),
                                             SizedBox(height: 7),
                                             Row(
 
-                                              children: [
-                                                SizedBox(width: 12),
-                                                Text(doc["comment"], style: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500), textAlign: TextAlign.left),
+                                                children: [
+                                                  SizedBox(width: 12),
+                                                  Text(doc["comment"],
+                                                      style: GoogleFonts.roboto(
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight
+                                                              .w500),
+                                                      textAlign: TextAlign
+                                                          .left),
 
-                                              ]
+                                                ]
                                             )
-                                        ]),
-                                      );
-                                    },
-                                  ));
-                                }), // To get COMMENTS
-                          ],
-                        ): SizedBox(), // Comments Section
-                      ]),
+                                          ]),
+                                        );
+                                      },
+                                    ));
+                                  }), // To get COMMENTS
+                            ],
+                          )
+                              : SizedBox(),
+                          // Comments Section
+                        ]);
+                    }
+                  )
                 ),
-              ));
+              );
 
   }
 }

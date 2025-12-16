@@ -12,6 +12,7 @@ import 'dart:convert';
 
 import 'components/custom_button.dart';
 import 'components/widget_tile.dart';
+import 'firestore_utils.dart';
 import 'home.dart';
 import 'widget_selection.dart';
 
@@ -63,63 +64,64 @@ class _CreatePageState extends State<CreatePage> {
 
 
 
-  Future<String> uploadImgToDb(XFile file) async {
-    try {
-      // Converts image into "bytes", a way of representing information
-      // final bytes = await file.readAsBytes();
-      // // Convert to base64, which is a more compact string of information
-      // final base64Image = base64Encode(bytes);
-
-      // Define the website we want to send to, while also giving them our API key (password)
-      // Make sure to replace the API key with yours in the link below
-      final uri = Uri.parse(
-          "http://129.146.24.130/alex/api/upload");
-      const password = "alex";
-      // Send "request", telling imgBB we want to upload the attached image
-      // final response = await http.post(
-      //   uri,
-      //   body: {
-      //     "image": base64Image,
-      //   },
-      // );
-      final request = http.MultipartRequest("POST",uri);
-      request.headers["Authorization"] = "Bearer $password";
-      print("File path: ${file.path}");
-
-      final multipartfile = await http.MultipartFile.fromPath("file", file.path);
-      request.files.add(multipartfile);
-
-      final streamedresponse = await request.send();
-      final response = await http.Response.fromStream(streamedresponse);
-
-      // Check if the request was successful, code 200 means it's all good! (anything that starts with 400 is usually an error)
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        // final returnedImageUrl = data['data']['url'];
-        final returnedImageUrl = data['url'];
-        print(returnedImageUrl);
-        return returnedImageUrl;
-
-      } else {
-        print("Error uploading: ${response.statusCode} ${response.body}");
-      }
-    } catch (error) {
-      print("error for put link $error");
-    }
-    return "";
-  }
+  // static Future<String> uploadImgToDb(XFile file) async {
+  //   try {
+  //     // Converts image into "bytes", a way of representing information
+  //     // final bytes = await file.readAsBytes();
+  //     // // Convert to base64, which is a more compact string of information
+  //     // final base64Image = base64Encode(bytes);
+  //
+  //     // Define the website we want to send to, while also giving them our API key (password)
+  //     // Make sure to replace the API key with yours in the link below
+  //     final uri = Uri.parse(
+  //         "http://129.146.24.130/alex/api/upload");
+  //     const password = "alex";
+  //     // Send "request", telling imgBB we want to upload the attached image
+  //     // final response = await http.post(
+  //     //   uri,
+  //     //   body: {
+  //     //     "image": base64Image,
+  //     //   },
+  //     // );
+  //     final request = http.MultipartRequest("POST",uri);
+  //     request.headers["Authorization"] = "Bearer $password";
+  //     print("File path: ${file.path}");
+  //
+  //     final multipartfile = await http.MultipartFile.fromPath("file", file.path);
+  //     request.files.add(multipartfile);
+  //
+  //     final streamedresponse = await request.send();
+  //     final response = await http.Response.fromStream(streamedresponse);
+  //
+  //     // Check if the request was successful, code 200 means it's all good! (anything that starts with 400 is usually an error)
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       // final returnedImageUrl = data['data']['url'];
+  //       final returnedImageUrl = data['url'];
+  //       print(returnedImageUrl);
+  //       return returnedImageUrl;
+  //
+  //     } else {
+  //       print("Error uploading: ${response.statusCode} ${response.body}");
+  //     }
+  //   } catch (error) {
+  //     print("error for put link $error");
+  //   }
+  //   return "";
+  // }
 
   void CreatePost(dynamic goTo) async {
     try {
       final postData = <String, dynamic>{
         "dateCreated": DateTime.now(),
         "title": titleController.text,
-        "url": (true) ? "" : await uploadImgToDb(imageFile!),
+        "url": "", // placeholder since not used
         "userID": FirebaseAuth.instance.currentUser!.uid,
         "description": descriptionController.text,
         "likes": 0,
         "dislikes": 0,
         "comments": [],
+        "widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),
       };
       if (!(goTo == null)) {
         Navigator.pushAndRemoveUntil(

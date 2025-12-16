@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+
+import 'components/widget_tile.dart';
 
 class FirestoreUtils {
   static final _db = FirebaseFirestore.instance;
@@ -56,6 +62,26 @@ class FirestoreUtils {
     }
   }
 
+  static Map<String, dynamic> WidgetTileToMap(WidgetTile widgetTile) {
+    final data = widgetTile.data;
+    switch(widgetTile.data["type"]) {
+      case WidgetTileType.imagePicker : widgetTile.data["type"] = "imagePicker";
+      case WidgetTileType.ingredientsList: widgetTile.data["type"] = "ingredientsList";
+    }
+    final input = data;
+    print(input);
+    return input;
+  }
+
+  static List<Map<String, dynamic>>  widgetTilesToMaps(List<WidgetTile> widgetTiles) {
+    List<Map<String, dynamic>> result = [];
+    for (WidgetTile widgetTile in widgetTiles) {
+      result.add(WidgetTileToMap(widgetTile));
+    }
+    print(result);
+    return result;
+  }
+
 
 
   static void updateUserData(dynamic newData, String userId, String fieldName, {bool addArray = false,bool removeArray = false}) async {
@@ -107,6 +133,51 @@ class FirestoreUtils {
       updateUserData(userID,profileID,"followers",removeArray:true);
       updateUserData(profileID,userID,"following",removeArray:true);
     }
+  }
+  static Future<String> uploadImgToDb(XFile file) async {
+    try {
+      // Converts image into "bytes", a way of representing information
+      // final bytes = await file.readAsBytes();
+      // // Convert to base64, which is a more compact string of information
+      // final base64Image = base64Encode(bytes);
+
+      // Define the website we want to send to, while also giving them our API key (password)
+      // Make sure to replace the API key with yours in the link below
+      final uri = Uri.parse(
+          "http://129.146.24.130/alex/api/upload");
+      const password = "alex";
+      // Send "request", telling imgBB we want to upload the attached image
+      // final response = await http.post(
+      //   uri,
+      //   body: {
+      //     "image": base64Image,
+      //   },
+      // );
+      final request = http.MultipartRequest("POST",uri);
+      request.headers["Authorization"] = "Bearer $password";
+      print("File path: ${file.path}");
+
+      final multipartfile = await http.MultipartFile.fromPath("file", file.path);
+      request.files.add(multipartfile);
+
+      final streamedresponse = await request.send();
+      final response = await http.Response.fromStream(streamedresponse);
+
+      // Check if the request was successful, code 200 means it's all good! (anything that starts with 400 is usually an error)
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // final returnedImageUrl = data['data']['url'];
+        final returnedImageUrl = data['url'];
+        print(returnedImageUrl);
+        return returnedImageUrl;
+
+      } else {
+        print("Error uploading: ${response.statusCode} ${response.body}");
+      }
+    } catch (error) {
+      print("error for put link $error");
+    }
+    return "";
   }
 }
 // Then you could combine them like this in your main code:

@@ -17,6 +17,7 @@ class WidgetSelector extends StatefulWidget {
 
 class _WidgetSelectorState extends State<WidgetSelector> {
   List<WidgetTile> cart = [];
+  Map<String, int> amounts = {"imagePicker": 0, "ingredientsList": 0};
   @override
   void initState() {
     // TODO: implement initState
@@ -45,10 +46,13 @@ class _WidgetSelectorState extends State<WidgetSelector> {
                   SizedBox(height: 80),
 
                   CartItem(
-                    onPressed: () {
-                      cart.add(WidgetTile(type: WidgetTileType.imagePicker,  delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.imagePicker, "url": ""}));
+                    add: () {
+                      cart.add(WidgetTile(type: WidgetTileType.imagePicker,  delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.imagePicker, "imageUrl": ""}));
                       print(cart);
+                      amounts["imagePicker"] = amounts["imagePicker"] !+ 1;
+                      setState(() {});
                     },
+                    subtract: () {if (cart.any((WidgetTile) => WidgetTile.type == WidgetTileType.imagePicker)) {amounts["imagePicker"] = amounts["imagePicker"] !- 1; cart.removeAt(cart.lastIndexWhere((WidgetTile) => WidgetTile.type == WidgetTileType.imagePicker)); setState(() {});} print(cart);},
                     itemName: "Image Picker",
                     width: 365,
                     height: 465,
@@ -56,21 +60,26 @@ class _WidgetSelectorState extends State<WidgetSelector> {
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: Color(0xFFD1D1EF)),
 
                       width: 320, height: 320,
-                      child: Icon(Icons.add_circle, size: 67, color: Colors.white)
+                      child: Icon(Icons.add_circle, size: 67, color: Colors.white),
                     ),
+                    amount: amounts["imagePicker"],
                   ),
 
                   SizedBox(height: 30),
 
                   CartItem(
-                      onPressed: () {
+                      add: () {
                         cart.add(WidgetTile(type: WidgetTileType.ingredientsList, delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.ingredientsList, "list": [],})); // enum
                         print("$cart <-- a list.");
+                        amounts["ingredientsList"] = amounts["ingredientsList"] !+ 1;
+                        setState(() {});
                       },
+                      subtract: () {if (cart.any((WidgetTile) => WidgetTile.type == WidgetTileType.ingredientsList)) {amounts["ingredientsList"] = amounts["ingredientsList"] !- 1; cart.removeAt(cart.lastIndexWhere((WidgetTile) => WidgetTile.type == WidgetTileType.ingredientsList)); setState(() {});} print(cart);},
                       itemName: "Ingredients List",
                       width: 375,
                       height: 270,
                       child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("- 5 grams ______"),Text("- 1 tsp ______"),Text("- 1 whole ______"),]))),
+                      amount: amounts["ingredientsList"],
                   ),
 
                   SizedBox(height: 30),
@@ -80,6 +89,7 @@ class _WidgetSelectorState extends State<WidgetSelector> {
                       onPressed: () {
                         print(cart);
                         Navigator.pop(context, cart);
+                        cart = [];
                       },
                       width: 300,
                       height: 55,

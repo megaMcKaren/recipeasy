@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../create.dart';
+import '../firestore_utils.dart';
 import 'custom_button.dart';
 
 enum WidgetTileType {
@@ -26,6 +27,14 @@ class WidgetTile extends StatefulWidget {
 }
 
 class _WidgetTileState extends State<WidgetTile> {
+
+  // late final data = widget.data;
+  //
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   data["imgUrl"] = ""; // what if its a list
+  // }
 
 
 
@@ -58,8 +67,8 @@ class _WidgetTileState extends State<WidgetTile> {
   }
   XFile? imageFile;
   ImagePicker imgPick = ImagePicker();
-  String imageUrl = "";
   Widget imagePicker() {
+    // final data = widget.data;
 
     void pickImg() async {
       print("Picking image...");
@@ -67,9 +76,10 @@ class _WidgetTileState extends State<WidgetTile> {
         var pickedImg = await imgPick.pickImage(source: ImageSource.gallery);
 
         if (pickedImg != null) {
-          // uploadImgToDb(pickedImg);
+          final String imageUrl = await FirestoreUtils.uploadImgToDb(pickedImg);
 
           setState((){
+            widget.data["imageUrl"] = imageUrl;
             imageFile = pickedImg;
             print(imageFile);
           });
@@ -80,8 +90,8 @@ class _WidgetTileState extends State<WidgetTile> {
     }
     return Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 30), child: Container(
         decoration: BoxDecoration(color: Color(0xFFFDFBFF), borderRadius: BorderRadius.circular(25)),
-        width: (imageFile == null) ? 340: null,
-        height: (imageFile == null) ? 410: null,
+        width: (imageFile == null) ? 380: null,
+        height: (imageFile == null) ? 430: null,
         child: Align(
             alignment: AlignmentGeometry.topCenter,
             child: (imageFile == null)
@@ -94,10 +104,11 @@ class _WidgetTileState extends State<WidgetTile> {
                     child: Container(
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: Color(0xFFD1D1EF)),
                         // onPressed: () {print("Image Picker");},
-                        width: 310, height: 310,
+                        width: 300, height: 300,
                         child: Icon(Icons.add_circle, size: 67, color: Colors.white)
                     ),
                   ),
+                  SizedBox(height: 10),
                   IconButton(onPressed: () => widget.delete(widget.index), icon: Icon(Icons.delete)),
                 ]
             ) : CupertinoContextMenu(actions: <Widget>[
@@ -119,8 +130,10 @@ class _WidgetTileState extends State<WidgetTile> {
         )
     ),);// child: IconButton(onPressed: widget.delete(widget.index), icon: Icon(Icons.delete)));
   }
+  List<String> ingredients = [];
+  TextEditingController ingredientController = TextEditingController();
   Widget ingredientsList() {
-    final data = widget.data;
+    final data = widget.data; // why not like this
     void addIngredient(x) {
       data["list"].add(x);
 
@@ -140,13 +153,48 @@ class _WidgetTileState extends State<WidgetTile> {
               padding: EdgeInsets.zero,
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: 5,
-              itemBuilder: (context, index) {return Align(alignment: Alignment.center, child: Padding(padding: EdgeInsets.only(left: 10, right: 10), child: Text("- ex")));},
+
+
+              itemCount: (data["list"].isNotEmpty) ? data["list"].length : 1,
+              itemBuilder: (context, index) {
+                return Padding(
+                        padding: EdgeInsets.only(left: 10, right: 10, top: 5),
+                        child: (data["list"].isNotEmpty) ? Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Text("• ${data["list"][index]}"),
+                              CustomButton(
+                                  onPressed: () {
+                                    data["list"].removeAt(index);
+                                    setState(() {});
+                                  },
+                                  width: 20,
+                                  height: 20,
+                                  text: Text(""),
+                                  icon: Icon(Icons.delete, size: 18),
+                              )
+                            ],
+                        ) : Center(
+                            child: Text(
+                                "Add a few items...",
+                                style: GoogleFonts.openSans(fontWeight: FontWeight.w300,
+                                    fontStyle: FontStyle.italic)
+                            )
+                        )
+                    );
+              },
 
             ),
 
             SizedBox(height: 5),
-            CustomButton(backgroundColor: Color(0xFFFFCCCC ), onPressed: () {}, width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 200, child: TextField(controller: ingredientController, decoration: InputDecoration(hintText: "Ingredient", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
+                SizedBox(width: 6.7),
+                CustomButton(backgroundColor: Color(0xFFFFCCCC ), onPressed: () {(ingredientController.text.isNotEmpty) ? {addIngredient(ingredientController.text), ingredientController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
+              ],
+            ),
             SizedBox(height: 5),
             IconButton(onPressed: () => widget.delete(widget.index), icon: Icon(Icons.delete)),
           ]
