@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
@@ -62,7 +63,7 @@ class FirestoreUtils {
     }
   }
 
-  static Map<String, dynamic> WidgetTileToMap(WidgetTile widgetTile) {
+  static Map<String, dynamic> widgetTileToMap(WidgetTile widgetTile) {
     final data = widgetTile.data;
     switch(widgetTile.data["type"]) {
       case WidgetTileType.imagePicker : widgetTile.data["type"] = "imagePicker";
@@ -73,16 +74,31 @@ class FirestoreUtils {
     return input;
   }
 
+  static WidgetTile mapToWidgetTile(Map<String, dynamic> map, int mapIndex, Function delete) {
+    WidgetTileType type = WidgetTileType.none;
+    switch(map["type"]) {
+      case "imagePicker" : type = WidgetTileType.imagePicker;
+      case "ingredientsList" : type = WidgetTileType.ingredientsList;
+    }
+    return WidgetTile(type: type, delete: delete, index: mapIndex, data: map);
+  }
+
   static List<Map<String, dynamic>>  widgetTilesToMaps(List<WidgetTile> widgetTiles) {
     List<Map<String, dynamic>> result = [];
     for (WidgetTile widgetTile in widgetTiles) {
-      result.add(WidgetTileToMap(widgetTile));
+      result.add(widgetTileToMap(widgetTile));
     }
     print(result);
     return result;
   }
 
-
+  static List<WidgetTile> mapListToWidgetTiles(List<dynamic> widgets, Function delete) {
+    List<WidgetTile> result = [];
+    for (int i = 0; i<widgets.length; i++) {
+      result.add(mapToWidgetTile(widgets[i], i, delete));
+    }
+    return result;
+  }
 
   static void updateUserData(dynamic newData, String userId, String fieldName, {bool addArray = false,bool removeArray = false}) async {
     try {
@@ -134,6 +150,7 @@ class FirestoreUtils {
       updateUserData(profileID,userID,"following",removeArray:true);
     }
   }
+
   static Future<String> uploadImgToDb(XFile file) async {
     try {
       // Converts image into "bytes", a way of representing information

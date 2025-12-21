@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen>  with RouteAware {
   @override
   void initState() {
     super.initState();
-    print("INITIALIZED AGAIN FOR HOME.DART");
+    // print("INITIALIZED AGAIN FOR HOME.DART");
     // postsFuture = loadAllPosts();
   }
 

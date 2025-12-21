@@ -12,6 +12,7 @@ import 'custom_button.dart';
 enum WidgetTileType {
   imagePicker,
   ingredientsList,
+  none,
 }
 
 class WidgetTile extends StatefulWidget {

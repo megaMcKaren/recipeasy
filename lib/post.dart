@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:social_media_app/firestore_utils.dart';
 import 'package:social_media_app/home.dart';
 import 'components/custom_button.dart';
+import 'create.dart';
 import 'postWrapper.dart';
 import 'profile/profile.dart';
 import 'components/profile_pic.dart';
@@ -216,7 +217,8 @@ class _PostState extends State<Post> {
                     }
 
 
-                    final data = snapshot.data;
+                    final data = snapshot.data; // Get Snapshot
+
                     if (data == null || data.isEmpty) {
                       return Center(child: Text("No data found."));
                     }
@@ -298,34 +300,35 @@ class _PostState extends State<Post> {
                                                       children: [
                                                         CustomButton(
                                                           onPressed: () async {
-                                                            print(
-                                                                "Edit/stop editing this post?");
-                                                            if (editing) {
-                                                              await db
-                                                                  .collection(
-                                                                  "posts")
-                                                                  .doc(
-                                                                  widget.postID)
-                                                                  .update({
-                                                                'title': postTitleCtr
-                                                                    .text,
-                                                                'description': descCtr
-                                                                    .text,
-                                                              });
-                                                              widget.title =
-                                                                  postTitleCtr
-                                                                      .text;
-                                                              widget
-                                                                  .description =
-                                                                  descCtr.text;
-                                                            }
-                                                            setState(() {
-                                                              editing =
-                                                              !editing;
-                                                            });
-                                                            print(widget.title);
-                                                            Navigator.of(
-                                                                context).pop();
+                                                            Navigator.push(context, MaterialPageRoute(builder: (_) => CreatePage(postID: widget.postID, postData: data,)));
+                                                            // print(
+                                                            //     "Edit/stop editing this post?");
+                                                            // if (editing) {
+                                                            //   await db
+                                                            //       .collection(
+                                                            //       "posts")
+                                                            //       .doc(
+                                                            //       widget.postID)
+                                                            //       .update({
+                                                            //     'title': postTitleCtr
+                                                            //         .text,
+                                                            //     'description': descCtr
+                                                            //         .text,
+                                                            //   });
+                                                            //   widget.title =
+                                                            //       postTitleCtr
+                                                            //           .text;
+                                                            //   widget
+                                                            //       .description =
+                                                            //       descCtr.text;
+                                                            // }
+                                                            // setState(() {
+                                                            //   editing =
+                                                            //   !editing;
+                                                            // });
+                                                            // print(widget.title);
+                                                            // Navigator.of(
+                                                            //     context).pop();
                                                           },
                                                           width: 300,
                                                           height: 60,
@@ -469,41 +472,37 @@ class _PostState extends State<Post> {
                           // If viewing from outside the post...
 
 
-                          (widget.showComments) ? Column(
-                            children: [
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: data["widgets"].length,
-                                itemBuilder: (context, index) {
-                                  if (data["widgets"][index]["type"] == "ingredientsList") {
-                                    return Padding(
+                          (widget.showComments) ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: data["widgets"].length,
+                            itemBuilder: (context, index) {
+                              if (data["widgets"][index]["type"] == "ingredientsList") {
+                                return Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Container(
+                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
+                                    child: Padding(
                                       padding: EdgeInsets.all(20),
-                                      child: Container(
-                                        decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(20),
-                                          child: ListView.builder(
-                                            shrinkWrap: true,
-                                            physics: NeverScrollableScrollPhysics(),
-                                            itemCount: data["widgets"][index]["list"].length,
-                                            itemBuilder: (context, index2) {
-                                              return Align(alignment: Alignment.topLeft, child: Text("• ${data["widgets"][index]["list"][index2]}"));
-                                            }
-                                          ),
-                                        ),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: data["widgets"][index]["list"].length,
+                                        itemBuilder: (context, index2) {
+                                          return Align(alignment: Alignment.topLeft, child: Text("• ${data["widgets"][index]["list"][index2]}"));
+                                        }
                                       ),
-                                    );
-                                  } else if (data["widgets"][index]["type"] == "imagePicker") {
-                                    return Padding(
-                                      padding: EdgeInsets.all(20),
-                                      child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.network(fit: BoxFit.cover, width: double.infinity, data["widgets"][index]["imageUrl"])),
-                                    );
-                                  }
-                                  return Align(alignment: Alignment.center, child: Text("Test"));
-                                }
-                              ),
-                            ],
+                                    ),
+                                  ),
+                                );
+                              } else if (data["widgets"][index]["type"] == "imagePicker") {
+                                return Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.network(fit: BoxFit.cover, width: double.infinity, data["widgets"][index]["imageUrl"])),
+                                );
+                              }
+                              return Align(alignment: Alignment.center, child: Text("Test"));
+                            }
                           ): SizedBox(),
 
 

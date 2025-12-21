@@ -17,7 +17,9 @@ import 'home.dart';
 import 'widget_selection.dart';
 
 class CreatePage extends StatefulWidget {
-  const CreatePage({super.key});
+  CreatePage({super.key, this.postID = "", this.postData = const {}});
+  String postID;
+  Map<String, dynamic> postData;
 
   @override
   State<CreatePage> createState() => _CreatePageState();
@@ -34,26 +36,20 @@ class _CreatePageState extends State<CreatePage> {
   List<WidgetTile> addedWidgets = [];
 
   String postTitle = "";
-  XFile? imageFile;
-  ImagePicker imagePicker = ImagePicker();
-  String imageUrl = "";
 
   void deleteAddedWidget(int index) {
-    print("$index AH");
 
     addedWidgets.removeAt(index);
     setState(() {
 
     });
     for (int i = index; i<addedWidgets.length; i++) {
-      print(i);
       addedWidgets[i].index -= 1;
     }
     setState(() { });
   }
 
   void returnUpdatedWidgets() async{ // called when Add Widgets + is pressed
-    print("Test add widget");
     final widgets = await Navigator.push(context, MaterialPageRoute(builder: (context) => WidgetSelector(startingCart: addedWidgets, delete: deleteAddedWidget)));
     setState(() {
       addedWidgets = widgets;
@@ -61,54 +57,6 @@ class _CreatePageState extends State<CreatePage> {
     setState(() {
     });
   }
-
-
-
-  // static Future<String> uploadImgToDb(XFile file) async {
-  //   try {
-  //     // Converts image into "bytes", a way of representing information
-  //     // final bytes = await file.readAsBytes();
-  //     // // Convert to base64, which is a more compact string of information
-  //     // final base64Image = base64Encode(bytes);
-  //
-  //     // Define the website we want to send to, while also giving them our API key (password)
-  //     // Make sure to replace the API key with yours in the link below
-  //     final uri = Uri.parse(
-  //         "http://129.146.24.130/alex/api/upload");
-  //     const password = "alex";
-  //     // Send "request", telling imgBB we want to upload the attached image
-  //     // final response = await http.post(
-  //     //   uri,
-  //     //   body: {
-  //     //     "image": base64Image,
-  //     //   },
-  //     // );
-  //     final request = http.MultipartRequest("POST",uri);
-  //     request.headers["Authorization"] = "Bearer $password";
-  //     print("File path: ${file.path}");
-  //
-  //     final multipartfile = await http.MultipartFile.fromPath("file", file.path);
-  //     request.files.add(multipartfile);
-  //
-  //     final streamedresponse = await request.send();
-  //     final response = await http.Response.fromStream(streamedresponse);
-  //
-  //     // Check if the request was successful, code 200 means it's all good! (anything that starts with 400 is usually an error)
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       // final returnedImageUrl = data['data']['url'];
-  //       final returnedImageUrl = data['url'];
-  //       print(returnedImageUrl);
-  //       return returnedImageUrl;
-  //
-  //     } else {
-  //       print("Error uploading: ${response.statusCode} ${response.body}");
-  //     }
-  //   } catch (error) {
-  //     print("error for put link $error");
-  //   }
-  //   return "";
-  // }
 
   void CreatePost(dynamic goTo) async {
     try {
@@ -135,6 +83,18 @@ class _CreatePageState extends State<CreatePage> {
     } catch (error) {
       print("Error creating post $error");
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.postData.isNotEmpty) {
+      titleController.text = widget.postData["title"];
+      descriptionController.text = widget.postData["description"];
+      // print("${widget.postData["widgets"]}");
+      addedWidgets = FirestoreUtils.mapListToWidgetTiles(widget.postData["widgets"], deleteAddedWidget);
+    }
+
   }
 
   @override
@@ -211,7 +171,7 @@ class _CreatePageState extends State<CreatePage> {
                   shrinkWrap: true,
                   itemCount: addedWidgets.length,
                   itemBuilder: (context, index) {
-                    print("$addedWidgets + $index vexillology");
+                    // print("$addedWidgets + $index vexillology");
                     return addedWidgets[index];
 
                   }
