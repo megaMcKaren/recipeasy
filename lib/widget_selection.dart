@@ -17,7 +17,7 @@ class WidgetSelector extends StatefulWidget {
 
 class _WidgetSelectorState extends State<WidgetSelector> {
   List<WidgetTile> cart = [];
-  Map<String, int> amounts = {"imagePicker": 0, "ingredientsList": 0};
+  Map<String, int> amounts = {"imagePicker": 0, "ingredientsList": 0, "instructions": 0};
   @override
   void initState() {
     // TODO: implement initState
@@ -80,6 +80,23 @@ class _WidgetSelectorState extends State<WidgetSelector> {
                       height: 270,
                       child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("- 5 grams ______"),Text("- 1 tsp ______"),Text("- 1 whole ______"),]))),
                       amount: amounts["ingredientsList"],
+                  ),
+
+                  SizedBox(height: 30),
+
+                  CartItem(
+                    add: () {
+                      cart.add(WidgetTile(type: WidgetTileType.instructions, delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.instructions, "list": [],})); // enum
+                      print("$cart <-- a list.");
+                      amounts["instructions"] = amounts["instructions"] !+ 1;
+                      setState(() {});
+                    },
+                    subtract: () {if (cart.any((WidgetTile) => WidgetTile.type == WidgetTileType.instructions)) {amounts["instructions"] = amounts["instructions"] !- 1; cart.removeAt(cart.lastIndexWhere((WidgetTile) => WidgetTile.type == WidgetTileType.instructions)); setState(() {});} print(cart);},
+                    itemName: "Instructions",
+                    width: 375,
+                    height: 270,
+                    child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("- 5 grams ______"),Text("- 1 tsp ______"),Text("- 1 whole ______"),]))),
+                    amount: amounts["instructions"],
                   ),
 
                   SizedBox(height: 30),

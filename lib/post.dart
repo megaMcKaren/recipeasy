@@ -196,6 +196,7 @@ class _PostState extends State<Post> {
   Widget build(BuildContext context) {
           final TextEditingController postTitleCtr = TextEditingController(text: widget.title);
           final TextEditingController descCtr = TextEditingController(text: widget.description);
+          Future postFuture = FirestoreUtils.fetchPostData(widget.postID);
           return Material(
               // drawer: Drawer(child: ListView(children: [
               //   ListTile(title: Text("Haaa")),
@@ -204,7 +205,7 @@ class _PostState extends State<Post> {
                 decoration: BoxDecoration(color: Color(0xFFF6DAD8), border: Border(top: BorderSide(color: (!widget.showComments)?Colors.black:Colors.transparent, width: 2.1))),
                 // color: Color(0xfff6dad8),
                 child: FutureBuilder(
-                  future: FirestoreUtils.fetchPostData(widget.postID),
+                  future: postFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState ==
                         ConnectionState.waiting) {
@@ -244,7 +245,6 @@ class _PostState extends State<Post> {
                                                         .description,
                                                     userID: widget.userID,)));
                                           if (result == 'refresh') {
-                                            print("did it work");
                                             widget.onBack();
                                           }
                                         }
@@ -277,7 +277,7 @@ class _PostState extends State<Post> {
                                 children: [
                                   IconButton(
                                     onPressed: () {
-                                      print("You pressed 3 dots in post.");
+                                      // print("You pressed 3 dots in post.");
                                       showGeneralDialog(
                                           context: context,
                                           barrierDismissible: true,
@@ -300,41 +300,16 @@ class _PostState extends State<Post> {
                                                       children: [
                                                         CustomButton(
                                                           onPressed: () async {
-                                                            Navigator.push(context, MaterialPageRoute(builder: (_) => CreatePage(postID: widget.postID, postData: data,)));
-                                                            // print(
-                                                            //     "Edit/stop editing this post?");
-                                                            // if (editing) {
-                                                            //   await db
-                                                            //       .collection(
-                                                            //       "posts")
-                                                            //       .doc(
-                                                            //       widget.postID)
-                                                            //       .update({
-                                                            //     'title': postTitleCtr
-                                                            //         .text,
-                                                            //     'description': descCtr
-                                                            //         .text,
-                                                            //   });
-                                                            //   widget.title =
-                                                            //       postTitleCtr
-                                                            //           .text;
-                                                            //   widget
-                                                            //       .description =
-                                                            //       descCtr.text;
-                                                            // }
-                                                            // setState(() {
-                                                            //   editing =
-                                                            //   !editing;
-                                                            // });
-                                                            // print(widget.title);
-                                                            // Navigator.of(
-                                                            //     context).pop();
-                                                          },
+                                                            bool result = await Navigator.push(context, MaterialPageRoute(builder: (_) => CreatePage(postID: widget.postID, postData: data,)));
+                                                            if (result) {
+                                                              setState(() {
+
+                                                              });
+                                                            }
+                                                            },
                                                           width: 300,
                                                           height: 60,
-                                                          text: Text((!editing)
-                                                              ? "Edit Post"
-                                                              : "Save Changes",
+                                                          text: Text("Edit Post",
                                                               style: GoogleFonts
                                                                   .robotoFlex(
                                                                   color: Colors
@@ -342,39 +317,11 @@ class _PostState extends State<Post> {
                                                                   fontSize: 30,
                                                                   decoration: TextDecoration
                                                                       .none)),
-                                                          icon: Icon(
-                                                              (!editing) ? Icons
-                                                                  .edit : Icons
-                                                                  .save,
+                                                          icon: Icon(Icons.edit,
                                                               size: 50),
 
                                                         ),
-                                                        ?(editing)
-                                                            ? CustomButton(
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              editing =
-                                                              !editing;
-                                                            });
-                                                            Navigator.of(
-                                                                context).pop();
-                                                          },
-                                                          width: 300,
-                                                          height: 60,
-                                                          text: Text(
-                                                              "Discard Changes",
-                                                              style: GoogleFonts
-                                                                  .robotoFlex(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 30,
-                                                                  decoration: TextDecoration
-                                                                      .none)),
-                                                          icon: Icon(Icons
-                                                              .no_adult_content,
-                                                              size: 50),
-                                                        )
-                                                            : null,
+
                                                         CustomButton(
                                                           onPressed: () {
                                                             print(

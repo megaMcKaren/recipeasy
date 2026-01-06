@@ -17,7 +17,7 @@ import 'home.dart';
 import 'widget_selection.dart';
 
 class CreatePage extends StatefulWidget {
-  CreatePage({super.key, this.postID = "", this.postData = const {}});
+  CreatePage({super.key, this.postID = "", this.postData = const {},});
   String postID;
   Map<String, dynamic> postData;
 
@@ -60,6 +60,7 @@ class _CreatePageState extends State<CreatePage> {
 
   void CreatePost(dynamic goTo) async {
     try {
+      print(addedWidgets);
       final postData = <String, dynamic>{
         "dateCreated": DateTime.now(),
         "title": titleController.text,
@@ -119,7 +120,7 @@ class _CreatePageState extends State<CreatePage> {
                       padding: EdgeInsets.only(left: 15, top: 15),
                       child: CustomButton(
                           onPressed: () {
-                            Navigator.pop(context);
+                            Navigator.pop(context, true);
                           },
                           width: 40,
                           height: 30,
@@ -190,7 +191,7 @@ class _CreatePageState extends State<CreatePage> {
 
               SizedBox(height: 20),
 
-              CustomButton(
+              (widget.postData.isEmpty) ? CustomButton(
                 onPressed: (postTitle != "")
                     ? () {
                   CreatePost(HomeScreen());
@@ -207,9 +208,23 @@ class _CreatePageState extends State<CreatePage> {
                 icon: Icon(Icons.upload_file),
                 backgroundColor: Color(0xFFE0E0FF),
 
+              ) : CustomButton(
+                onPressed: () {
+                  FirestoreUtils.updatePostData({"title": titleController.text,"description": descriptionController.text,"widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),}, widget.postID);
+
+
+                  Navigator.pop(context, true);
+                  Navigator.of(context).pop();
+                },
+                width: 230,
+                height: 40,
+                text: Text("Update Recipe", style: GoogleFonts.robotoFlex(fontSize: 20, fontWeight: FontWeight.w600)), //Text(text, style: GoogleFonts.robotoFlex(color: Colors.black, fontSize: 30, decoration: TextDecoration.none))
+                icon: Icon(Icons.update),
+                backgroundColor: Color(0xFFE0E0FF),
+
               ),
 
-              SizedBox(height: 15),
+              SizedBox(height: 75),
 
             ]),
       ));

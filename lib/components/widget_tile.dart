@@ -12,7 +12,7 @@ import 'custom_button.dart';
 enum WidgetTileType {
   imagePicker,
   ingredientsList,
-  none,
+  none, instructions,
 }
 
 class WidgetTile extends StatefulWidget {
@@ -46,6 +46,8 @@ class _WidgetTileState extends State<WidgetTile> {
       return imagePicker();
     } else if (widget.type == WidgetTileType.ingredientsList) {
       return ingredientsList();
+    } else if (widget.type == WidgetTileType.instructions) {
+      return instructions();
     }
     return Text("nothing :(");
     // GestureDetector(
@@ -66,13 +68,14 @@ class _WidgetTileState extends State<WidgetTile> {
     //       : Image.file(File(imageFile!.path)),
     // ),
   }
-  XFile? imageFile;
+  // XFile? imageFile;
   ImagePicker imgPick = ImagePicker();
   Widget imagePicker() {
+    print(widget.data["imageUrl"]);
     // final data = widget.data;
 
     void pickImg() async {
-      print("Picking image...");
+
       try {
         var pickedImg = await imgPick.pickImage(source: ImageSource.gallery);
 
@@ -81,8 +84,8 @@ class _WidgetTileState extends State<WidgetTile> {
 
           setState((){
             widget.data["imageUrl"] = imageUrl;
-            imageFile = pickedImg;
-            print(imageFile);
+            // imageFile = pickedImg;
+            // print(imageFile);
           });
         }
       } catch (error) {
@@ -91,11 +94,11 @@ class _WidgetTileState extends State<WidgetTile> {
     }
     return Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 30), child: Container(
         decoration: BoxDecoration(color: Color(0xFFFDFBFF), borderRadius: BorderRadius.circular(25)),
-        width: (imageFile == null) ? 380: null,
-        height: (imageFile == null) ? 430: null,
+        width: (widget.data["imageUrl"].isEmpty) ? 380: null,
+        height: (widget.data["imageUrl"].isEmpty) ? 430: null,
         child: Align(
             alignment: AlignmentGeometry.topCenter,
-            child: (imageFile == null)
+            child: (widget.data["imageUrl"].isEmpty)
               ? Column(
                 children: [
                   SizedBox(height: 20),
@@ -127,9 +130,15 @@ class _WidgetTileState extends State<WidgetTile> {
                 ),
               ),
             ],
-            child: ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.file(File(imageFile!.path))))
+            child: GestureDetector(onTap: () => pickImg(), child: ClipRRect(borderRadius: BorderRadius.circular(25), child: Image.network(widget.data["imageUrl"]))))
         )
     ),);// child: IconButton(onPressed: widget.delete(widget.index), icon: Icon(Icons.delete)));
+  }
+  TextEditingController instructionsController = TextEditingController();
+  Widget instructions() {
+    return Padding(padding: EdgeInsets.all(20), child: TextField(
+        textAlign: TextAlign.center,
+        controller: instructionsController));
   }
   List<String> ingredients = [];
   TextEditingController ingredientController = TextEditingController();

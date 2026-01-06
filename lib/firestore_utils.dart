@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
@@ -49,7 +51,7 @@ class FirestoreUtils {
     }
   }
 
-  static void updatePostData(dynamic newData, String postId, String fieldName,) async {
+  static void updatePostData(dynamic newData, String postId,) async {
     try {
       final postSnap = _db.collection('posts').doc(postId);
 
@@ -151,8 +153,10 @@ class FirestoreUtils {
     }
   }
 
+
   static Future<String> uploadImgToDb(XFile file) async {
     try {
+
       // Converts image into "bytes", a way of representing information
       // final bytes = await file.readAsBytes();
       // // Convert to base64, which is a more compact string of information
@@ -197,13 +201,3 @@ class FirestoreUtils {
     return "";
   }
 }
-// Then you could combine them like this in your main code:
-//
-// final postData = await FirestoreUtils.fetchPostData(postId);
-// final userId = postData?['userID'];
-//
-// if (userId != null) {
-// final userData = await FirestoreUtils.fetchUserData(userId);
-// final username = userData?['username'];
-// final profilePic = userData?['profilePictureUrl'];
-// }
