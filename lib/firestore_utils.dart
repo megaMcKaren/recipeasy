@@ -70,6 +70,8 @@ class FirestoreUtils {
     switch(widgetTile.data["type"]) {
       case WidgetTileType.imagePicker : widgetTile.data["type"] = "imagePicker";
       case WidgetTileType.ingredientsList: widgetTile.data["type"] = "ingredientsList";
+      case WidgetTileType.instructions: widgetTile.data["type"] = "instructions";
+      case WidgetTileType.description: widgetTile.data["type"] = "description";
     }
     final input = data;
     print(input);
@@ -81,6 +83,8 @@ class FirestoreUtils {
     switch(map["type"]) {
       case "imagePicker" : type = WidgetTileType.imagePicker;
       case "ingredientsList" : type = WidgetTileType.ingredientsList;
+      case "instructions" : type = WidgetTileType.instructions;
+      case "description" : type = WidgetTileType.description;
     }
     return WidgetTile(type: type, delete: delete, index: mapIndex, data: map);
   }

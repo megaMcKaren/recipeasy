@@ -17,7 +17,7 @@ class WidgetSelector extends StatefulWidget {
 
 class _WidgetSelectorState extends State<WidgetSelector> {
   List<WidgetTile> cart = [];
-  Map<String, int> amounts = {"imagePicker": 0, "ingredientsList": 0, "instructions": 0};
+  Map<String, int> amounts = {"imagePicker": 0, "ingredientsList": 0, "instructions": 0, "description": 0};
   @override
   void initState() {
     // TODO: implement initState
@@ -78,7 +78,7 @@ class _WidgetSelectorState extends State<WidgetSelector> {
                       itemName: "Ingredients List",
                       width: 375,
                       height: 270,
-                      child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("- 5 grams ______"),Text("- 1 tsp ______"),Text("- 1 whole ______"),]))),
+                      child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("• 5 grams ______"),Text("• 1 tsp ______"),Text("• 1 whole ______"),]))),
                       amount: amounts["ingredientsList"],
                   ),
 
@@ -95,8 +95,25 @@ class _WidgetSelectorState extends State<WidgetSelector> {
                     itemName: "Instructions",
                     width: 375,
                     height: 270,
-                    child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("- 5 grams ______"),Text("- 1 tsp ______"),Text("- 1 whole ______"),]))),
+                    child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("1. Mix ___"),Text("2. Bake at 400 F"),Text("3. Serve"),]))),
                     amount: amounts["instructions"],
+                  ),
+
+                  SizedBox(height: 30),
+
+                  CartItem(
+                    add: () {
+                      cart.add(WidgetTile(type: WidgetTileType.description, delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.description, "list": [],})); // enum
+                      print("$cart <-- a list.");
+                      amounts["description"] = amounts["description"] !+ 1;
+                      setState(() {});
+                    },
+                    subtract: () {if (cart.any((WidgetTile) => WidgetTile.type == WidgetTileType.description)) {amounts["description"] = amounts["description"] !- 1; cart.removeAt(cart.lastIndexWhere((WidgetTile) => WidgetTile.type == WidgetTileType.description)); setState(() {});} print(cart);},
+                    itemName: "Description",
+                    width: 375,
+                    height: 270,
+                    child: Container(width: 300, decoration: BoxDecoration(color: Color(0xFFDFDFFF), borderRadius: BorderRadius.circular(17)), child: Padding(padding: EdgeInsets.all(12), child: Text("This recipe was invented in 1000 B.C."))),
+                    amount: amounts["description"],
                   ),
 
                   SizedBox(height: 30),

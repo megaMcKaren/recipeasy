@@ -103,14 +103,14 @@ class Post extends StatefulWidget {
         required this.postID,
         required this.title, //require the title property to be provided
         required this.imageUrl,
-        required this.description,
+        required this.subtitle,
         required this.userID,
         required this.showComments,
         required this.onBack,
       });
   String title;
   final String imageUrl;
-  String description;
+  String subtitle;
   final String postID ;
   final String userID ;
   final bool showComments;
@@ -195,7 +195,7 @@ class _PostState extends State<Post> {
 
   Widget build(BuildContext context) {
           final TextEditingController postTitleCtr = TextEditingController(text: widget.title);
-          final TextEditingController descCtr = TextEditingController(text: widget.description);
+          final TextEditingController descCtr = TextEditingController(text: widget.subtitle);
           Future postFuture = FirestoreUtils.fetchPostData(widget.postID);
           return Material(
               // drawer: Drawer(child: ListView(children: [
@@ -241,8 +241,8 @@ class _PostState extends State<Post> {
                                                     postID: widget.postID,
                                                     title: widget.title,
                                                     imageUrl: widget.imageUrl,
-                                                    description: widget
-                                                        .description,
+                                                    subtitle: widget
+                                                        .subtitle,
                                                     userID: widget.userID,)));
                                           if (result == 'refresh') {
                                             widget.onBack();
@@ -373,13 +373,13 @@ class _PostState extends State<Post> {
 
                           (!editing) ? Padding(
                               padding: EdgeInsets.only(left: 20, right: 20),
-                              child: Text(widget.description)) : SizedBox(
+                              child: Text(widget.subtitle, textAlign: TextAlign.center,)) : SizedBox(
                             width: 350,
                             child: TextField(
                               controller: descCtr,
                               textAlign: TextAlign.center,
                               decoration: const InputDecoration(
-                                hintText: "Enter new description",
+                                hintText: "Enter new subtitle",
                               ),
                               style: TextStyle(
                                   fontWeight: FontWeight.w400, fontSize: 15),
@@ -401,7 +401,7 @@ class _PostState extends State<Post> {
                                   PostWrapper(postID: widget.postID,
                                     title: widget.title,
                                     imageUrl: widget.imageUrl,
-                                    description: widget.description,
+                                    subtitle: widget.subtitle,
                                     userID: widget.userID,)));
                               if (result == 'refresh') {
                                 print("did it work");
@@ -446,6 +446,35 @@ class _PostState extends State<Post> {
                                 return Padding(
                                   padding: EdgeInsets.all(20),
                                   child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.network(fit: BoxFit.cover, width: double.infinity, data["widgets"][index]["imageUrl"])),
+                                );
+                              } else if (data["widgets"][index]["type"] == "instructions") {
+                                return Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Container(
+                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: ListView.builder(
+                                          shrinkWrap: true,
+                                          physics: NeverScrollableScrollPhysics(),
+                                          itemCount: data["widgets"][index]["list"].length,
+                                          itemBuilder: (context, index2) {
+                                            return Align(alignment: Alignment.topLeft, child: Text("${index + 1}. ${data["widgets"][index]["list"][index2]}"));
+                                          }
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else if (data["widgets"][index]["type"] == "description") {
+                                return Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Container(
+                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: Text("ABC"),
+                                    ),
+                                  ),
                                 );
                               }
                               return Align(alignment: Alignment.center, child: Text("Test"));

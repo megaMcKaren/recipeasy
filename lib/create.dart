@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -31,11 +32,14 @@ class _CreatePageState extends State<CreatePage> {
   final db = FirebaseFirestore.instance;
 
   final titleController = TextEditingController();
-  final descriptionController = TextEditingController();
+  final subtitleController = TextEditingController();
+
+  final ImagePicker imgPick = ImagePicker();
 
   List<WidgetTile> addedWidgets = [];
 
   String postTitle = "";
+  String postUrl = "";
 
   void deleteAddedWidget(int index) {
 
@@ -58,15 +62,36 @@ class _CreatePageState extends State<CreatePage> {
     });
   }
 
+
+
+  void pickImg() async {
+
+    try {
+      var pickedImg = await imgPick.pickImage(source: ImageSource.gallery);
+
+      if (pickedImg != null) {
+        final String imageUrl = await FirestoreUtils.uploadImgToDb(pickedImg);
+
+        setState((){
+          postUrl = imageUrl;
+          // imageFile = pickedImg;
+          // print(imageFile);
+        });
+      }
+    } catch (error) {
+      print("pickImg: $error");
+    }
+  }
+
   void CreatePost(dynamic goTo) async {
     try {
       print(addedWidgets);
       final postData = <String, dynamic>{
         "dateCreated": DateTime.now(),
         "title": titleController.text,
-        "url": "", // placeholder since not used
+        "url": postUrl, // placeholder since not used
         "userID": FirebaseAuth.instance.currentUser!.uid,
-        "description": descriptionController.text,
+        "subtitle": subtitleController.text,
         "likes": 0,
         "dislikes": 0,
         "comments": [],
@@ -83,6 +108,8 @@ class _CreatePageState extends State<CreatePage> {
       await db.collection("posts").doc().set(postData);
     } catch (error) {
       print("Error creating post $error");
+      print(addedWidgets[0].type);
+      print(addedWidgets[0].data);
     }
   }
 
@@ -91,8 +118,8 @@ class _CreatePageState extends State<CreatePage> {
     super.initState();
     if (widget.postData.isNotEmpty) {
       titleController.text = widget.postData["title"];
-      descriptionController.text = widget.postData["description"];
-      // print("${widget.postData["widgets"]}");
+      subtitleController.text = widget.postData["subtitle"];
+      postUrl = widget.postData["url"];
       addedWidgets = FirestoreUtils.mapListToWidgetTiles(widget.postData["widgets"], deleteAddedWidget);
     }
 
@@ -100,8 +127,6 @@ class _CreatePageState extends State<CreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    // final titleController = TextEditingController(text: widget.title);
-    // final descriptionController = TextEditingController(text: widget.desc);
     titleController.addListener(() {
       setState(() {
         postTitle = titleController.text;
@@ -150,21 +175,63 @@ class _CreatePageState extends State<CreatePage> {
                 ]
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+
+          Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 30), child: Container(
+              decoration: BoxDecoration(color: Color(0xFFFDFBFF), borderRadius: BorderRadius.circular(25)),
+              width: (postUrl.isEmpty) ? 380: null,
+              height: (postUrl.isEmpty) ? 390: null,
+              child: Align(
+                  alignment: AlignmentGeometry.topCenter,
+                  child: (postUrl.isEmpty)
+                      ? Column(
+                      children: [
+                        SizedBox(height: 20),
+                        Text(style: GoogleFonts.robotoSlab(fontWeight: FontWeight.w600), "Thumbnail"),
+                        SizedBox(height: 20),
+                        GestureDetector(onTap: () => pickImg(),//CreatePage.pickImg,
+                          child: Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), color: Color(0xFFD1D1EF)),
+                              // onPressed: () {print("Image Picker");},
+                              width: 300, height: 300,
+                              child: Icon(Icons.add_circle, size: 67, color: Colors.white)
+                          ),
+                        ),
+                      ]
+                  ) : CupertinoContextMenu(actions: <Widget>[
+                    Align(
+                      alignment: AlignmentGeometry.center,
+                      child: CupertinoContextMenuAction(
+                        onPressed: () {
+
+                          Navigator.pop(context);
+                        },
+                        isDestructiveAction: true,
+                        trailingIcon: CupertinoIcons.delete,
+                        child: const Text('Delete'),
+                      ),
+                    ),
+                  ],
+                      child: GestureDetector(onTap: () => pickImg(), child: ClipRRect(borderRadius: BorderRadius.circular(25), child: Image.network((postUrl.isEmpty) ? widget.postData["url"] : postUrl))))
+              )
+          )),
+
+              SizedBox(height: 20),
 
               SizedBox(
                 width: 330,
                 child: TextField(
-                  controller: descriptionController,
+                  controller: subtitleController,
                   textAlign: TextAlign.center,
-                  maxLines: 3,
+                  maxLines: 1,
+                  maxLength: 37,
                   style: GoogleFonts.aBeeZee(fontSize: 13),
                   decoration: const InputDecoration(
-                    hintText: "Enter description",
+                    hintText: "Enter subtitle",
                     border: OutlineInputBorder(),
                   ),
                 ),
-              ), // TextField for Description
+              ), // TextField for Subtitle
 
               ListView.builder(
                   padding: EdgeInsets.zero, // <_+AYH_)IHpode
@@ -195,6 +262,7 @@ class _CreatePageState extends State<CreatePage> {
                 onPressed: (postTitle != "")
                     ? () {
                   CreatePost(HomeScreen());
+                  print("HELLO?! CREATE?");
                   // Navigator.pushAndRemoveUntil(
                   //   context,
                   //   MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -210,7 +278,7 @@ class _CreatePageState extends State<CreatePage> {
 
               ) : CustomButton(
                 onPressed: () {
-                  FirestoreUtils.updatePostData({"title": titleController.text,"description": descriptionController.text,"widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),}, widget.postID);
+                  FirestoreUtils.updatePostData({"title": titleController.text,"subtitle": subtitleController.text,"widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),}, widget.postID);
 
 
                   Navigator.pop(context, true);

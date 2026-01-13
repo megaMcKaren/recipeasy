@@ -392,7 +392,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   body:
                                 ListView(
                                   children: [
-                                    Post(postID: post.id,title: postData['title'],imageUrl: postData['url'],description: postData['description'],userID: postData['userID'],showComments: true, onBack: () {},),
+                                    Post(postID: post.id,title: postData['title'],imageUrl: postData['url'],subtitle: postData['subtitle'],userID: postData['userID'],showComments: true, onBack: () {},),
                                   ],
                                 ),
                                 )

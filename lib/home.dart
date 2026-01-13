@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>  with RouteAware {
-  static final _scaffoldKey = GlobalKey<ScaffoldState>(); // 👈 the “remote”
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // the remote":)"
 
   // late Future<dynamic> postsFuture;
 
@@ -205,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen>  with RouteAware {
                         title: data['title'],
                         imageUrl: (data['url'] == "") ? "" : data['url'],
 
-                        description: data['description'],
+                        subtitle: data['subtitle'],
 
                         userID: data['userID'],
                         showComments: false,

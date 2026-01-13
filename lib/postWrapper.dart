@@ -7,12 +7,12 @@ class PostWrapper extends StatefulWidget {
         required this.postID,
         required this.title, //require the title property to be provided
         required this.imageUrl,
-        required this.description,
+        required this.subtitle,
         required this.userID,
       });
   final String title;
   final String imageUrl;
-  final String description;
+  final String subtitle;
   final String postID;
   final String userID;
 
@@ -40,7 +40,7 @@ class _PostWrapperState extends State<PostWrapper> {
           },
         ),
       ),
-      body: ListView(children: [Post(postID: widget.postID, title: widget.title, imageUrl: widget.imageUrl, description: widget.description,userID: widget.userID, showComments: true, onBack: () {print("HAppy birthday");})]),
+      body: ListView(children: [Post(postID: widget.postID, title: widget.title, imageUrl: widget.imageUrl, subtitle: widget.subtitle,userID: widget.userID, showComments: true, onBack: () {print("HAppy birthday");})]),
     );
   }
 }

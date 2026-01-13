@@ -12,7 +12,7 @@ import 'custom_button.dart';
 enum WidgetTileType {
   imagePicker,
   ingredientsList,
-  none, instructions,
+  none, instructions, description,
 }
 
 class WidgetTile extends StatefulWidget {
@@ -48,6 +48,8 @@ class _WidgetTileState extends State<WidgetTile> {
       return ingredientsList();
     } else if (widget.type == WidgetTileType.instructions) {
       return instructions();
+    } else if (widget.type == WidgetTileType.description) {
+      return description();
     }
     return Text("nothing :(");
     // GestureDetector(
@@ -136,11 +138,81 @@ class _WidgetTileState extends State<WidgetTile> {
   }
   TextEditingController instructionsController = TextEditingController();
   Widget instructions() {
+    final data = widget.data; // why not like this
+    void addIngredient(x) {
+      data["list"].add(x);
+
+    }
+    return Padding(
+        padding: EdgeInsets.all(20),
+        child: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(18),
+            color: Colors.white,
+
+          ),
+          child: Column(children: [
+            SizedBox(height: 15),
+            Text("Instructions", style: GoogleFonts.robotoFlex(fontWeight: FontWeight.w600, fontSize: 25,)),
+
+            ListView.builder(
+              padding: EdgeInsets.zero,
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+
+
+              itemCount: (data["list"].isNotEmpty) ? data["list"].length : 1,
+              itemBuilder: (context, index) {
+                return Padding(
+                    padding: EdgeInsets.only(left: 10, right: 10, top: 5),
+                    child: (data["list"].isNotEmpty) ? Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Text("${index + 1}. ${data["list"][index]}"),
+                        CustomButton(
+                          onPressed: () {
+                            data["list"].removeAt(index);
+                            setState(() {});
+                          },
+                          width: 20,
+                          height: 20,
+                          text: Text(""),
+                          icon: Icon(Icons.delete, size: 18),
+                        )
+                      ],
+                    ) : Center(
+                        child: Text(
+                            "Add a few steps...",
+                            style: GoogleFonts.openSans(fontWeight: FontWeight.w300,
+                                fontStyle: FontStyle.italic)
+                        )
+                    )
+                );
+              },
+
+            ),
+
+            SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 200, child: TextField(controller: instructionsController, decoration: InputDecoration(hintText: "Instructions", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
+                SizedBox(width: 6.7),
+                CustomButton(backgroundColor: Color(0xFFFFCCCC ), onPressed: () {(instructionsController.text.isNotEmpty) ? {addIngredient(instructionsController.text), instructionsController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
+              ],
+            ),
+            SizedBox(height: 5),
+            IconButton(onPressed: () => widget.delete(widget.index), icon: Icon(Icons.delete)),
+          ]
+          ),
+        )
+    );
+  }
+  TextEditingController descriptionController = TextEditingController();
+  Widget description() {
     return Padding(padding: EdgeInsets.all(20), child: TextField(
         textAlign: TextAlign.center,
-        controller: instructionsController));
+        controller: descriptionController));
   }
-  List<String> ingredients = [];
   TextEditingController ingredientController = TextEditingController();
   Widget ingredientsList() {
     final data = widget.data; // why not like this
