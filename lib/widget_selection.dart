@@ -103,7 +103,7 @@ class _WidgetSelectorState extends State<WidgetSelector> {
 
                   CartItem(
                     add: () {
-                      cart.add(WidgetTile(type: WidgetTileType.description, delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.description, "list": [],})); // enum
+                      cart.add(WidgetTile(type: WidgetTileType.description, delete: widget.delete, index: cart.length, data: {"type": WidgetTileType.description, "text": ""})); // enum
                       print("$cart <-- a list.");
                       amounts["description"] = amounts["description"] !+ 1;
                       setState(() {});

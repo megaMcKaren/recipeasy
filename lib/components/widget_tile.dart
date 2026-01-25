@@ -209,6 +209,10 @@ class _WidgetTileState extends State<WidgetTile> {
   }
   TextEditingController descriptionController = TextEditingController();
   Widget description() {
+    descriptionController.addListener(() async {
+      widget.data["text"] = descriptionController.text;
+    });
+    print("${widget.data}    26y234623gagasgsggaga");
     return Padding(padding: EdgeInsets.all(20), child: TextField(
         textAlign: TextAlign.center,
         controller: descriptionController));

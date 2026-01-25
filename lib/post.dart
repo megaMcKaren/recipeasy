@@ -361,7 +361,7 @@ class _PostState extends State<Post> {
                                     },
                                     icon: Icon(Icons.more_vert),
                                     iconSize: 30,
-                                  ),
+                                  ), // 3 Dots Button
                                 ],
                               ) else
                                 SizedBox(),
@@ -369,24 +369,8 @@ class _PostState extends State<Post> {
                           ),
                           // Stack for Post Title & Edit Btn.
 
-                          SizedBox(height: 5),
+                          SizedBox(height: 10),
 
-                          (!editing) ? Padding(
-                              padding: EdgeInsets.only(left: 20, right: 20),
-                              child: Text(widget.subtitle, textAlign: TextAlign.center,)) : SizedBox(
-                            width: 350,
-                            child: TextField(
-                              controller: descCtr,
-                              textAlign: TextAlign.center,
-                              decoration: const InputDecoration(
-                                hintText: "Enter new subtitle",
-                              ),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w400, fontSize: 15),
-                            ),
-                          ),
-
-                          SizedBox(height: 13),
 
                           ProfilePicWidget(picSize: 15,
                               textSize: 15,
@@ -414,10 +398,26 @@ class _PostState extends State<Post> {
                                   child: Container(decoration: BoxDecoration(
                                       color: Colors.black,
                                       borderRadius: BorderRadius.circular(25)),
-                                      child: Image.network(widget.imageUrl)))
+                                      child: ClipRRect(borderRadius: BorderRadius.circular(20), child: Image.network(widget.imageUrl))))
                                   : SizedBox(height: 15)),
-                          // If viewing from outside the post...
+                          // If viewing from outside the post...thumbnail
 
+                          (!editing) ? Padding(
+                              padding: EdgeInsets.only(left: 20, right: 20),
+                              child: Text(widget.subtitle, textAlign: TextAlign.center,)) : SizedBox(
+                            width: 350,
+                            child: TextField(
+                              controller: descCtr,
+                              textAlign: TextAlign.center,
+                              decoration: const InputDecoration(
+                                hintText: "Enter new subtitle",
+                              ),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 15),
+                            ),
+                          ), // Subtitle
+
+                          SizedBox(height: 10),
 
                           (widget.showComments) ? ListView.builder(
                             shrinkWrap: true,
@@ -428,16 +428,22 @@ class _PostState extends State<Post> {
                                 return Padding(
                                   padding: EdgeInsets.all(20),
                                   child: Container(
-                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
+                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(25)),
                                     child: Padding(
                                       padding: EdgeInsets.all(20),
-                                      child: ListView.builder(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        itemCount: data["widgets"][index]["list"].length,
-                                        itemBuilder: (context, index2) {
-                                          return Align(alignment: Alignment.topLeft, child: Text("• ${data["widgets"][index]["list"][index2]}"));
-                                        }
+                                      child: Column(
+                                        children: [
+                                          Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w600, fontSize: 28,), "Ingredients"),
+                                          SizedBox(height: 10),
+                                          ListView.builder(
+                                            shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
+                                            itemCount: data["widgets"][index]["list"].length,
+                                            itemBuilder: (context, index2) {
+                                              return Align(alignment: Alignment.topLeft, child: Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 20,), "• ${data["widgets"][index]["list"][index2]}"));
+                                            }
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -445,22 +451,28 @@ class _PostState extends State<Post> {
                               } else if (data["widgets"][index]["type"] == "imagePicker") {
                                 return Padding(
                                   padding: EdgeInsets.all(20),
-                                  child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.network(fit: BoxFit.cover, width: double.infinity, data["widgets"][index]["imageUrl"])),
+                                  child: ClipRRect(borderRadius: BorderRadius.circular(25), child: Image.network(fit: BoxFit.cover, width: double.infinity, data["widgets"][index]["imageUrl"])),
                                 );
                               } else if (data["widgets"][index]["type"] == "instructions") {
                                 return Padding(
                                   padding: EdgeInsets.all(20),
                                   child: Container(
-                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
+                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(25)),
                                     child: Padding(
                                       padding: EdgeInsets.all(20),
-                                      child: ListView.builder(
-                                          shrinkWrap: true,
-                                          physics: NeverScrollableScrollPhysics(),
-                                          itemCount: data["widgets"][index]["list"].length,
-                                          itemBuilder: (context, index2) {
-                                            return Align(alignment: Alignment.topLeft, child: Text("${index + 1}. ${data["widgets"][index]["list"][index2]}"));
-                                          }
+                                      child: Column(
+                                        children: [
+                                          Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w600, fontSize: 28,), "Instructions"),
+                                          SizedBox(height: 10),
+                                          ListView.builder(
+                                              shrinkWrap: true,
+                                              physics: NeverScrollableScrollPhysics(),
+                                              itemCount: data["widgets"][index]["list"].length,
+                                              itemBuilder: (context, index2) {
+                                                return Align(alignment: Alignment.topLeft, child: Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 20,), "${index2 + 1}. ${data["widgets"][index]["list"][index2]}"));
+                                              }
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -469,10 +481,16 @@ class _PostState extends State<Post> {
                                 return Padding(
                                   padding: EdgeInsets.all(20),
                                   child: Container(
-                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(15)),
+                                    decoration: BoxDecoration(color: Color(0xFFFFFAFA), borderRadius: BorderRadius.circular(25)),
                                     child: Padding(
                                       padding: EdgeInsets.all(20),
-                                      child: Text("ABC"),
+                                      child: Column(
+                                        children: [
+                                          Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w600, fontSize: 28,), "Description"),
+                                          SizedBox(height: 10),
+                                          Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 20,),textAlign: TextAlign.center, "${data["widgets"][index]["text"]}"),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 );
