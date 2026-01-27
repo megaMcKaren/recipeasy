@@ -5,6 +5,7 @@ import 'profile/profile.dart';
 import 'post.dart';
 import 'sign_in.dart';
 import 'create.dart';
+import 'search/search.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -146,6 +147,20 @@ class _HomeScreenState extends State<HomeScreen>  with RouteAware {
                         context,
                         MaterialPageRoute(
                             builder: (context) => CreatePage()));
+                    _scaffoldKey.currentState?.closeDrawer();
+                  },
+                ),
+                ListTile(
+                  leading: const SizedBox(
+                    width: 35,
+                    child: Icon(Icons.search),
+                  ),
+                  title: const Text("Search"),
+                  onTap: () async {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SearchPage()));
                     _scaffoldKey.currentState?.closeDrawer();
                   },
                 ),
