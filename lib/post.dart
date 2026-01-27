@@ -63,30 +63,6 @@ class CommentWidget extends StatelessWidget {
                 },child: CircleAvatar(radius: 20, backgroundImage: NetworkImage(userData["pfp"]))),
                 SizedBox(width: 10),
                 Text(userData["username"], style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w600)),
-                Expanded(child: Align(alignment: AlignmentGeometry.topRight, child: IconButton(onPressed: () {
-                  showGeneralDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      barrierLabel: "Dismiss",
-                      pageBuilder: (context, anim1, anim2) {
-                        return Align(
-                          alignment: Alignment.center,
-                          child: Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(50),
-                                  color: Color(0xFFBB5555)),
-                              width: 375,
-                              height: 270,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                                  CustomButton(onPressed: () {print("EDITING");}, width: 300, height: 60, text: "Edit Comment", icon: Icons.edit),
-                                CustomButton(onPressed: () {print("DELETED");}, width: 300, height: 60, text: "Delete Comment", icon: Icons.delete_forever),
-
-                                ],
-                              ),
-                        ));
-                      },
-                  );
-                }, icon: Icon(Icons.arrow_drop_down)))),
                 SizedBox(width: 10),
                 // Use userData["pfp"/"username"] and comment["comment"]
               ],

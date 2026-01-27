@@ -152,7 +152,7 @@ class _WidgetTileState extends State<WidgetTile> {
           ),
           child: Column(children: [
             SizedBox(height: 15),
-            Text("Instructions", style: GoogleFonts.robotoFlex(fontWeight: FontWeight.w600, fontSize: 25,)),
+            Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w600, fontSize: 28,), "Instructions"),
 
             ListView.builder(
               padding: EdgeInsets.zero,
@@ -167,7 +167,7 @@ class _WidgetTileState extends State<WidgetTile> {
                     child: (data["list"].isNotEmpty) ? Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text("${index + 1}. ${data["list"][index]}"),
+                        Text("${index + 1}. ${data["list"][index]}", style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 20)),
                         CustomButton(
                           onPressed: () {
                             data["list"].removeAt(index);
@@ -177,7 +177,7 @@ class _WidgetTileState extends State<WidgetTile> {
                           height: 20,
                           text: Text(""),
                           icon: Icon(Icons.delete, size: 18),
-                        )
+                        ) // Delete
                       ],
                     ) : Center(
                         child: Text(
@@ -195,7 +195,7 @@ class _WidgetTileState extends State<WidgetTile> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(width: 200, child: TextField(controller: instructionsController, decoration: InputDecoration(hintText: "Instructions", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
+                SizedBox(width: 200, child: TextField(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 17), controller: instructionsController, decoration: InputDecoration(hintText: "Enter instruction", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
                 SizedBox(width: 6.7),
                 CustomButton(backgroundColor: Color(0xFFFFCCCC ), onPressed: () {(instructionsController.text.isNotEmpty) ? {addIngredient(instructionsController.text), instructionsController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
               ],
@@ -209,13 +209,15 @@ class _WidgetTileState extends State<WidgetTile> {
   }
   TextEditingController descriptionController = TextEditingController();
   Widget description() {
+    descriptionController.text = widget.data["text"];
     descriptionController.addListener(() async {
       widget.data["text"] = descriptionController.text;
     });
     print("${widget.data}    26y234623gagasgsggaga");
     return Padding(padding: EdgeInsets.all(20), child: TextField(
         textAlign: TextAlign.center,
-        controller: descriptionController));
+        controller: descriptionController,
+        decoration: InputDecoration(hintText: "Enter description", isDense: true, contentPadding: EdgeInsets.only(bottom: 2))));
   }
   TextEditingController ingredientController = TextEditingController();
   Widget ingredientsList() {
@@ -233,7 +235,7 @@ class _WidgetTileState extends State<WidgetTile> {
           ),
           child: Column(children: [
             SizedBox(height: 15),
-            Text("Ingredients", style: GoogleFonts.robotoFlex(fontWeight: FontWeight.w600, fontSize: 25,)),
+            Text(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w600, fontSize: 28,), "Ingredients"),
 
             ListView.builder(
               padding: EdgeInsets.zero,
@@ -248,7 +250,7 @@ class _WidgetTileState extends State<WidgetTile> {
                         child: (data["list"].isNotEmpty) ? Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text("• ${data["list"][index]}"),
+                              Text("• ${data["list"][index]}", style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 20)),
                               CustomButton(
                                   onPressed: () {
                                     data["list"].removeAt(index);
@@ -276,7 +278,7 @@ class _WidgetTileState extends State<WidgetTile> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(width: 200, child: TextField(controller: ingredientController, decoration: InputDecoration(hintText: "Ingredient", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
+                SizedBox(width: 200, child: TextField(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 17,), controller: ingredientController, decoration: InputDecoration(hintText: "Enter ingredient", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
                 SizedBox(width: 6.7),
                 CustomButton(backgroundColor: Color(0xFFFFCCCC ), onPressed: () {(ingredientController.text.isNotEmpty) ? {addIngredient(ingredientController.text), ingredientController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
               ],

@@ -74,6 +74,7 @@ class _CreatePageState extends State<CreatePage> {
 
         setState((){
           postUrl = imageUrl;
+          print("CHANGED");
           // imageFile = pickedImg;
           // print(imageFile);
         });
@@ -121,6 +122,12 @@ class _CreatePageState extends State<CreatePage> {
       subtitleController.text = widget.postData["subtitle"];
       postUrl = widget.postData["url"];
       addedWidgets = FirestoreUtils.mapListToWidgetTiles(widget.postData["widgets"], deleteAddedWidget);
+      print("BEGINNING OF THIS");
+      print(widget.postData["widgets"]);
+      print(addedWidgets[0].data);
+      print(addedWidgets[1].data);
+      print(addedWidgets);
+      print("END OF THIS");
     }
 
   }
@@ -278,7 +285,7 @@ class _CreatePageState extends State<CreatePage> {
 
               ) : CustomButton(
                 onPressed: () {
-                  FirestoreUtils.updatePostData({"title": titleController.text,"subtitle": subtitleController.text,"widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),}, widget.postID);
+                  FirestoreUtils.updatePostData({"url": postUrl, "title": titleController.text,"subtitle": subtitleController.text,"widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),}, widget.postID);
 
 
                   Navigator.pop(context, true);
