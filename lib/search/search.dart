@@ -7,6 +7,8 @@ import '../post.dart';
 import '../profile/profile.dart';
 import '../constants/tags.dart';
 
+final db = FirebaseFirestore.instance;
+
 
 
 class SearchPage extends StatefulWidget {
@@ -19,6 +21,23 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
 
   List<bool> tagStates = List.generate(Tags.tags.length, (int index) => false);
+
+  final TextEditingController searchController = TextEditingController();
+
+  String searchKey = "pi";
+
+  db.collection("posts")
+      .where("name", isGreaterThanOrEqualTo: searchKey)
+      .where("name", isLessThanOrEqualTo: searchKey + '\uf8ff')
+      .get()
+      .then(
+  (querySnapshot) {
+    for (var docSnapshot in querySnapshot.docs) {
+    print('${docSnapshot.id} => ${docSnapshot.data()}');
+    }
+    },
+    onError: (e) => print("Error completing: $e"),
+  );
 
 
   Future<dynamic> loadAllPosts() async {
@@ -72,8 +91,8 @@ class _SearchPageState extends State<SearchPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(child: TextField(decoration: InputDecoration(hintText: "Search up a recipe!", border: OutlineInputBorder(borderRadius: BorderRadius.circular(50))), textAlign: TextAlign.left)),
-                    IconButton(onPressed: () {print("Search!!!");}, icon: Icon(Icons.search, size: 20)),
+                    Expanded(child: TextField(controller: searchController, decoration: InputDecoration(hintText: "Search up a recipe!", border: OutlineInputBorder(borderRadius: BorderRadius.circular(50))), textAlign: TextAlign.left)),
+                    IconButton(onPressed: () {print(searchController.text);}, icon: Icon(Icons.search, size: 20)),
                   ],
                 ),
               ),
@@ -126,6 +145,48 @@ class _SearchPageState extends State<SearchPage> {
               // Row(children: [
               //   CustomButton(onPressed: onPressed, width: width, height: height, text: text, icon: icon)
               // ]),
+              FutureBuilder<dynamic>(
+                  future: loadAllPosts(),//postsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    final querySnapshot = snapshot.data;
+                    if (querySnapshot == null || querySnapshot.isEmpty) {
+                      return Center(child: Text("No posts found."));
+                    }
+                    print("Hello world!");
+
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: querySnapshot.length,
+                        itemBuilder: (context, index) {
+                          final data = querySnapshot[index];
+
+                          // final data = doc.data() as Map<String, dynamic>;
+                          // print(doc.id);
+                          // print(data);
+                          return Post(
+                            postID: data['id'],
+                            title: data['title'],
+                            imageUrl: (data['url'] == "") ? "" : data['url'],
+
+                            subtitle: data['subtitle'],
+
+                            userID: data['userID'],
+                            showComments: false,
+                            onBack: reload,
+                            // continue with the other properties you defined in the Post class
+                          );
+                        },
+                      ),
+                    );
+                  }),
             ],
           )
         ));
