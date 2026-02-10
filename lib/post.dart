@@ -178,7 +178,7 @@ class _PostState extends State<Post> {
               //   ListTile(title: Text("Haaa")),
               // ])),
               child: Container(
-                decoration: BoxDecoration(color: Color(0xFFF6DAD8), border: Border(top: BorderSide(color: (!widget.showComments)?Colors.black:Colors.transparent, width: 2.1))),
+                decoration: BoxDecoration(color: Color(0xffdfe8ff), border: Border(top: BorderSide(color: (!widget.showComments)?Colors.black:Colors.transparent, width: 2.1))),
                 // color: Color(0xfff6dad8),
                 child: FutureBuilder(
                   future: postFuture,
@@ -267,9 +267,9 @@ class _PostState extends State<Post> {
                                                         borderRadius: BorderRadius
                                                             .circular(50),
                                                         color: Color(
-                                                            0xFFBB5555)),
-                                                    width: 375,
-                                                    height: 270,
+                                                            0xFFAAAADD)),
+                                                    width: 350,
+                                                    height: 260,
                                                     child: Column(
                                                       mainAxisAlignment: MainAxisAlignment
                                                           .spaceEvenly,

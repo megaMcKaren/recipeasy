@@ -40,6 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String buttonText = "Follow";
+  String newPfpUrl = "";
   Future<void> updateButtonText() async{
     final newText = (await FirestoreUtils.isFollowing(FirebaseAuth.instance.currentUser!.uid, widget.userID)) ? "Unfollow" : "Follow";
     setState(() {
@@ -107,6 +108,11 @@ class _ProfilePageState extends State<ProfilePage> {
             appBar: AppBar(
                 flexibleSpace: Stack(children: [
                   // Image.network(data["bgImg"]),
+                  Align(alignment: AlignmentGeometry.bottomLeft, child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.add_photo_alternate),
+                  )
+                  ),
                   Center(child: Image.network(data["bgImg"])),
                   Center(child: Container(color: Color(0x55000000), width: 1000, height: 1000)),
 
@@ -127,44 +133,54 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           (!editingPfp) ? GestureDetector(
                             onTap: () {
-                              editingPfp = !editingPfp;
                               setState(() {
-
+                                editingPfp = !editingPfp;
                               });
-                              print("$editingPfp <-- bool editingPfp in profile.dart");
                             },
                             child:  CircleAvatar(
                                 radius: 40,
                                 backgroundImage: NetworkImage(data["pfp"]),
                                 onBackgroundImageError: (exception, stackTrace) {
                                   print('Image load failed: $exception');
-                                }))
-                          : Row(
+                                }
+                                )
+                          )
+                          :
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SizedBox(width: 94),
-                              SizedBox(
-                                  width: 240,
-                                  child: TextField(
-                                    controller: pfpUrlCtr,
-                                    textAlign: TextAlign.center,
-                                    decoration: const InputDecoration(
-                                        iconColor: Colors.red, hintText: "Enter image URL"),
-                                  ),
-                                ),
+                              GestureDetector(
+                                onTap: () async {
+
+                                  newPfpUrl =  await FirestoreUtils.pickImg();
+                                  setState(() {
+
+                                  });
+
+                                },//CreatePage.pickImg,
+                                child: (newPfpUrl == "") ? Container(
+                                    alignment: AlignmentGeometry.center,
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(40), color: Color(0xFFD1D1EF)),
+                                    width: 80, height: 80,
+                                    child: Icon(Icons.add_circle, size: 40, color: Colors.white)
+                                ) :
+                                CircleAvatar(
+                                    radius: 40,
+                                    backgroundImage: NetworkImage(newPfpUrl),
+                                    onBackgroundImageError: (exception, stackTrace) {
+                                      print('Image load failed: $exception');
+                                    }),
+                              ),
                               IconButton(
                                 onPressed: () async {
+                                  FirestoreUtils.updateUserData(newPfpUrl, widget.userID, "pfp");
+
                                   setState(() {
+                                    data["pfp"] = newPfpUrl;
+                                    newPfpUrl = "";
                                     editingPfp = !editingPfp;
                                   });
-                                  if (!editingPfp) {
-                                    await db
-                                        .collection("profiles")
-                                        .doc(widget.userID)
-                                        .update({
-                                      'pfp': pfpUrlCtr.text,
-                                    });
-                                  }
                                 },
                                 icon: const Icon(Icons.check),
                                 color: Colors.white,
@@ -294,7 +310,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => FollowPage(userId: widget.userID)));
+                              builder: (context) => FollowPage(userId: widget.userID,  username: data["username"])));
                     },child: Text("${data['following'].length} Following")),
                     (!signedInUserProfile) ? ElevatedButton(onPressed: () => doButtonStuff(), child: Text(buttonText)) : SizedBox(),
                     // GestureDetector(onTap: () async {
@@ -387,7 +403,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) =>
                                 Scaffold(
-                                  backgroundColor: Color(0xfff6dad8),
+                                  backgroundColor: Color(0xffdfe8ff),
                                   appBar: AppBar(),
                                   body:
                                 ListView(

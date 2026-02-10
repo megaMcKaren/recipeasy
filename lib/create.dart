@@ -13,6 +13,8 @@ import 'dart:convert';
 
 import 'components/custom_button.dart';
 import 'components/widget_tile.dart';
+import 'constants/imgPicker.dart';
+import 'constants/tags.dart';
 import 'firestore_utils.dart';
 import 'home.dart';
 import 'widget_selection.dart';
@@ -34,12 +36,13 @@ class _CreatePageState extends State<CreatePage> {
   final titleController = TextEditingController();
   final subtitleController = TextEditingController();
 
-  final ImagePicker imgPick = ImagePicker();
 
   List<WidgetTile> addedWidgets = [];
 
   String postTitle = "";
   String postUrl = "";
+
+  List<bool> tagStates = List.generate(Tags.tags.length, (int index) => false);
 
   void deleteAddedWidget(int index) {
 
@@ -67,7 +70,7 @@ class _CreatePageState extends State<CreatePage> {
   void pickImg() async {
 
     try {
-      var pickedImg = await imgPick.pickImage(source: ImageSource.gallery);
+      var pickedImg = await ImgPicker.imgPick.pickImage(source: ImageSource.gallery);
 
       if (pickedImg != null) {
         final String imageUrl = await FirestoreUtils.uploadImgToDb(pickedImg);
@@ -97,6 +100,8 @@ class _CreatePageState extends State<CreatePage> {
         "dislikes": 0,
         "comments": [],
         "widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),
+        "keywords": [],
+        "tags": tagStates,
       };
       if (!(goTo == null)) {
         Navigator.pushAndRemoveUntil(
@@ -122,12 +127,6 @@ class _CreatePageState extends State<CreatePage> {
       subtitleController.text = widget.postData["subtitle"];
       postUrl = widget.postData["url"];
       addedWidgets = FirestoreUtils.mapListToWidgetTiles(widget.postData["widgets"], deleteAddedWidget);
-      print("BEGINNING OF THIS");
-      print(widget.postData["widgets"]);
-      print(addedWidgets[0].data);
-      print(addedWidgets[1].data);
-      print(addedWidgets);
-      print("END OF THIS");
     }
 
   }
@@ -143,8 +142,8 @@ class _CreatePageState extends State<CreatePage> {
       color: Color(0xFFEEEEFF),
       child: SingleChildScrollView(
         child: Column(children: [
-              SizedBox(height: 87.5),
-              Stack(
+          SizedBox(height: 87.5),
+          Stack(
                 children: [
                   Align(
                     alignment: Alignment.bottomLeft,
@@ -181,8 +180,60 @@ class _CreatePageState extends State<CreatePage> {
                   ),
                 ]
               ),
+          const SizedBox(height: 10),
 
-              const SizedBox(height: 10),
+          Text("Filters", style: GoogleFonts.fanwoodText(fontSize: 20)),
+          IconButton(onPressed: () {
+            showDialog(
+                context: context,
+                barrierDismissible: true,
+                barrierLabel: "Dismiss",
+                builder: (context) {
+                  return StatefulBuilder(
+                    builder: (context, StateSetter setState) {
+                      return Align(
+                          alignment: AlignmentGeometry
+                              .center,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Color(0xFFFAFAFA)
+                            ),
+                            width: 375,
+                            height: 405,
+                            child: SizedBox(
+                              width: 200,
+                              height: 200,
+                              child: GridView.builder(
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                                itemCount: tagStates.length,
+                                itemBuilder: (context, index) {
+                                  final tag = tagStates;
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: CustomButton(
+                                        width: 80,
+                                        height: 40,
+                                        text: Text(style: GoogleFonts.alumniSans(fontSize: 20), Tags.tags[index]),
+                                        icon: null,
+                                        backgroundColor: (tagStates[index]) ? Colors.indigo: Colors.blue,
+                                        onPressed: () {
+                                          setState(() {
+                                            tagStates[index] = !tagStates[index];
+                                          });
+                                        }),
+                                  );
+                                },
+
+                              ),
+                            ),
+                          )
+                      );
+                    },
+                  );
+                }
+            );
+          }, icon: Icon(Icons.filter_list)),
 
           Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 30), child: Container(
               decoration: BoxDecoration(color: Color(0xFFFDFBFF), borderRadius: BorderRadius.circular(25)),
@@ -223,9 +274,9 @@ class _CreatePageState extends State<CreatePage> {
               )
           )),
 
-              SizedBox(height: 20),
+          SizedBox(height: 20),
 
-              SizedBox(
+          SizedBox(
                 width: 330,
                 child: TextField(
                   controller: subtitleController,
@@ -240,7 +291,7 @@ class _CreatePageState extends State<CreatePage> {
                 ),
               ), // TextField for Subtitle
 
-              ListView.builder(
+          ListView.builder(
                   padding: EdgeInsets.zero, // <_+AYH_)IHpode
                   physics: NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
@@ -251,9 +302,10 @@ class _CreatePageState extends State<CreatePage> {
 
                   }
               ),
-              SizedBox(height: 20),
 
-              CustomButton(
+          SizedBox(height: 20),
+
+          CustomButton(
                 onPressed: returnUpdatedWidgets,
                 width: 230,
                 height: 40,
@@ -263,9 +315,9 @@ class _CreatePageState extends State<CreatePage> {
 
               ),
 
-              SizedBox(height: 20),
+          SizedBox(height: 20),
 
-              (widget.postData.isEmpty) ? CustomButton(
+          (widget.postData.isEmpty) ? CustomButton(
                 onPressed: (postTitle != "")
                     ? () {
                   CreatePost(HomeScreen());
@@ -299,9 +351,9 @@ class _CreatePageState extends State<CreatePage> {
 
               ),
 
-              SizedBox(height: 75),
+          SizedBox(height: 75),
 
-            ]),
+        ]),
       ));
 
   }

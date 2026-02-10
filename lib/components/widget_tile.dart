@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../constants/imgPicker.dart';
 import '../create.dart';
 import '../firestore_utils.dart';
 import 'custom_button.dart';
@@ -73,7 +74,6 @@ class _WidgetTileState extends State<WidgetTile> {
     // ),
   }
   // XFile? imageFile;
-  ImagePicker imgPick = ImagePicker();
   Widget imagePicker() {
     print(widget.data["imageUrl"]);
     // final data = widget.data;
@@ -81,7 +81,7 @@ class _WidgetTileState extends State<WidgetTile> {
     void pickImg() async {
 
       try {
-        var pickedImg = await imgPick.pickImage(source: ImageSource.gallery);
+        var pickedImg = await ImgPicker.imgPick.pickImage(source: ImageSource.gallery);
 
         if (pickedImg != null) {
           final String imageUrl = await FirestoreUtils.uploadImgToDb(pickedImg);
@@ -199,7 +199,7 @@ class _WidgetTileState extends State<WidgetTile> {
               children: [
                 SizedBox(width: 200, child: TextField(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 17), controller: instructionsController, decoration: InputDecoration(hintText: "Enter instruction", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
                 SizedBox(width: 6.7),
-                CustomButton(backgroundColor: Color(0xFFFFCCCC ), onPressed: () {(instructionsController.text.isNotEmpty) ? {addIngredient(instructionsController.text), instructionsController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
+                CustomButton(backgroundColor: Color(0xFFCCCCFF), onPressed: () {(instructionsController.text.isNotEmpty) ? {addIngredient(instructionsController.text), instructionsController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
               ],
             ),
             SizedBox(height: 5),
@@ -282,7 +282,7 @@ class _WidgetTileState extends State<WidgetTile> {
               children: [
                 SizedBox(width: 200, child: TextField(style: GoogleFonts.fanwoodText(fontWeight: FontWeight.w500, fontSize: 17,), controller: ingredientController, decoration: InputDecoration(hintText: "Enter ingredient", isDense: true, contentPadding: EdgeInsets.only(bottom: 2)), textAlign: TextAlign.center, )),
                 SizedBox(width: 6.7),
-                CustomButton(backgroundColor: Color(0xFFFFCCCC ), onPressed: () {(ingredientController.text.isNotEmpty) ? {addIngredient(ingredientController.text), ingredientController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
+                CustomButton(backgroundColor: Color(0xFFCCCCFF), onPressed: () {(ingredientController.text.isNotEmpty) ? {addIngredient(ingredientController.text), ingredientController.clear(), setState(() {})} : print("hey put smth");} , width: 50, height: 30, text: Text("Add"), icon: null, borderRadius: 15,),
               ],
             ),
             SizedBox(height: 5),

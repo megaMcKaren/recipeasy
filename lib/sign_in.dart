@@ -25,12 +25,12 @@ class _SignInState extends State<SignIn> {
                   decoration: BoxDecoration(
                       color: Color(0xffffffffff),
                       borderRadius: BorderRadius.circular(37.5)),
-                  width: 250,
-                  height: 400,
+                  width: 270,
+                  height: 320,
                   child: Form(
                     //key: _formKey,
                       child: Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(25),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -65,49 +65,43 @@ class _SignInState extends State<SignIn> {
                               //   return null;
                               // },
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 16.0),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        try {
-                                          FirebaseAuth.instance
-                                              .signInWithEmailAndPassword(
-                                              email: emailController.text,
-                                              password:
-                                              passwordController.text);
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                try {
+                                  FirebaseAuth.instance
+                                      .signInWithEmailAndPassword(
+                                      email: emailController.text,
+                                      password:
+                                      passwordController.text);
 
-                                          Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      HomeScreen()));
-                                        } on FirebaseAuthException catch (e) {
-                                          if (e.code == 'user-not-found') {
-                                            print('No user found for that email.');
-                                          } else if (e.code == 'wrong-password') {
-                                            print(
-                                                'Wrong password provided for that user.');
-                                          } else {
-                                            print("here");
-                                          }
-                                        }
-                                      },
-                                      child: const Text('Log in'),
-                                    ),
-                                    SizedBox(height: 10),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => SignUp()));
-                                      },
-                                      child: const Text("Don't have an account"),
-                                    )
-                                  ]),
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              HomeScreen()));
+                                } on FirebaseAuthException catch (e) {
+                                  if (e.code == 'user-not-found') {
+                                    print('No user found for that email.');
+                                  } else if (e.code == 'wrong-password') {
+                                    print(
+                                        'Wrong password provided for that user.');
+                                  } else {
+                                    print("here");
+                                  }
+                                }
+                              },
+                              child: const Text('Log in'),
+                            ),
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SignUp()));
+                              },
+                              child: const Text("Don't have an account"),
                             ),
                           ],
                         ),

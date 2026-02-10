@@ -4,5 +4,10 @@ class Tags{
     "Lunch",
     "Brunch",
     "Breakfast",
+    "Large",
+    "Medium",
+    "Small",
+    "Quick",
+    "Slow",
   ];
 }

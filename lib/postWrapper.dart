@@ -31,7 +31,7 @@ class _PostWrapperState extends State<PostWrapper> {
       //     ],
       //   )
       // ),
-      backgroundColor: Color(0xfff6dad8),
+      backgroundColor: Color(0xffdfe8ff),
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

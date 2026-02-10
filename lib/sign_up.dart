@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'components/custom_button.dart';
 import 'sign_in.dart';
 import 'home.dart';
 
@@ -58,12 +59,12 @@ class _SignUpState extends State<SignUp> {
                   decoration: BoxDecoration(
                       color: Color(0xffffffffff),
                       borderRadius: BorderRadius.circular(37.5)),
-                  width: 250,
-                  height: 400,
+                  width: 280,
+                  height: 370,
                   child: Form(
                     //key: _formKey,
                       child: Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(25),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -110,35 +111,32 @@ class _SignUpState extends State<SignUp> {
                               //   return null;
                               // },
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 16.0),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        if (await CreateUser()) {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                  const HomeScreen()));
-                                        }
-                                      },
-                                      child: const Text('Submit'),
-                                    ),
-                                    SizedBox(height: 10),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                const SignIn()));
-                                      },
-                                      child: const Text('Already have an account'),
-                                    ),
-                                  ]),
+                            SizedBox(height: 10),
+                            CustomButton(
+                              onPressed: () async {
+                                if (await CreateUser()) {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                          const HomeScreen()));
+                                }
+                              },
+                              width: 100,
+                              height: 50,
+                              text: const Text('Submit'),
+                              icon: null,
+                            ),
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        const SignIn()));
+                              },
+                              child: const Text('Already have an account'),
                             ),
                           ],
                         ),

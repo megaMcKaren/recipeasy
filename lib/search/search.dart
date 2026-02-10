@@ -20,43 +20,58 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
 
+  late List<Map<String, dynamic>> posts;
+
+  bool isLoading = true;
+
   List<bool> tagStates = List.generate(Tags.tags.length, (int index) => false);
 
   final TextEditingController searchController = TextEditingController();
 
-  String searchKey = "pi";
+  void searchFirestore(String searchKey) async {
+    // searchKey = searchKey.toLowerCase();
+    QuerySnapshot abc = await db.collection("posts")
+      .where("title", isGreaterThanOrEqualTo: searchKey)
+      .where("title", isLessThanOrEqualTo: '$searchKey\uf8ff')
+      .get();
+    final data = abc.docs.map(
+      (doc) {
+        final a = doc.data() as Map<String, dynamic>;
+        a['id'] = doc.id;
+        return a;
+      }
+    ).toList();
+    setState(() {
+      posts = data;
+    });
+  }
 
-  db.collection("posts")
-      .where("name", isGreaterThanOrEqualTo: searchKey)
-      .where("name", isLessThanOrEqualTo: searchKey + '\uf8ff')
-      .get()
-      .then(
-  (querySnapshot) {
-    for (var docSnapshot in querySnapshot.docs) {
-    print('${docSnapshot.id} => ${docSnapshot.data()}');
-    }
-    },
-    onError: (e) => print("Error completing: $e"),
-  );
+
 
 
   Future<dynamic> loadAllPosts() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       final QuerySnapshot<Map<String, dynamic>> data = await FirebaseFirestore.instance.collection('posts').get();
 
-      List<Map<String, dynamic>> posts = [];
+      List<Map<String, dynamic>> postList = [];
 
       for (var doc in data.docs) {
         final a = doc.data();
         a['id'] = doc.id;
-        posts.add(a);
+        postList.add(a);
       }
 
-      posts.sort((a,b){
+      postList.sort((a,b){
         return b['dateCreated'].toDate().compareTo(a['dateCreated'].toDate());
       });
 
-      return posts;
+      setState(() {
+        posts = postList;
+        isLoading = false;
+      });
     } catch (e) {
       print("Fetching all posts failed: $e");
       return null;
@@ -71,6 +86,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
+    loadAllPosts();
   }
 
 
@@ -92,50 +108,67 @@ class _SearchPageState extends State<SearchPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Expanded(child: TextField(controller: searchController, decoration: InputDecoration(hintText: "Search up a recipe!", border: OutlineInputBorder(borderRadius: BorderRadius.circular(50))), textAlign: TextAlign.left)),
-                    IconButton(onPressed: () {print(searchController.text);}, icon: Icon(Icons.search, size: 20)),
+                    IconButton(onPressed: () {
+                      print(searchController.text);
+                      searchFirestore(searchController.text);
+                    }, icon: Icon(Icons.search, size: 20)),
                   ],
                 ),
               ),
+
               SizedBox(height: 10),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Filters", style: GoogleFonts.fanwoodText(fontSize: 20)),
                   IconButton(onPressed: () {
-                    showGeneralDialog(
+                    showDialog(
                         context: context,
                         barrierDismissible: true,
                         barrierLabel: "Dismiss",
-                        pageBuilder: (context, anim1, anim2) {
-                          return Align(
-                              alignment: AlignmentGeometry
-                                  .center,
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius
-                                          .circular(50),
-                                      color: Color(
-                                          0xFFFAFAFA)),
-                                  width: 375,
-                                  height: 405,
-                                  child: GridView.builder(
-                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-                                    itemCount: tagStates.length,
-                                    itemBuilder: (context, index) {
-                                      final tag = tagStates;
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: (tagStates[index]) ? Colors.red: Colors.blue), onPressed: () {
+                        builder: (context) {
+                          return StatefulBuilder(
+                            builder: (context, StateSetter setState) {
+                              return Align(
+                                  alignment: AlignmentGeometry
+                                      .center,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: Color(0xFFFAFAFA)
+                                    ),
+                                    width: 375,
+                                    height: 405,
+                                    child: SizedBox(
+                                      width: 200,
+                                      height: 200,
+                                      child: GridView.builder(
+                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                                        itemCount: tagStates.length,
+                                        itemBuilder: (context, index) {
+                                          final tag = tagStates;
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: CustomButton(
+                                                width: 80,
+                                                height: 40,
+                                                text: Text(style: GoogleFonts.alumniSans(fontSize: 20), Tags.tags[index]),
+                                                icon: null,
+                                                backgroundColor: (tagStates[index]) ? Colors.indigo: Colors.blue,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    tagStates[index] = !tagStates[index];
+                                                  });
+                                            }),
+                                          );
+                                        },
 
-                                          setState(() {
-                                            tagStates[index] = !tagStates[index];
-                                          });
-                                        }, child: Text(style: GoogleFonts.alumniSans(fontSize: 20), Tags.tags[index])),
-                                      );
-                                    },
-
-                                  ),
-                              )
+                                      ),
+                                    ),
+                                  )
+                              );
+                            },
                           );
                         }
                     );
@@ -145,48 +178,36 @@ class _SearchPageState extends State<SearchPage> {
               // Row(children: [
               //   CustomButton(onPressed: onPressed, width: width, height: height, text: text, icon: icon)
               // ]),
-              FutureBuilder<dynamic>(
-                  future: loadAllPosts(),//postsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
+              (!isLoading) ? Expanded(
+                child: ListView.builder(
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    final data = posts[index];
 
-                    final querySnapshot = snapshot.data;
-                    if (querySnapshot == null || querySnapshot.isEmpty) {
-                      return Center(child: Text("No posts found."));
-                    }
-                    print("Hello world!");
+                    // final data = doc.data() as Map<String, dynamic>;
+                    // print(doc.id);
+                    print(data);
 
-                    return Expanded(
-                      child: ListView.builder(
-                        itemCount: querySnapshot.length,
-                        itemBuilder: (context, index) {
-                          final data = querySnapshot[index];
 
-                          // final data = doc.data() as Map<String, dynamic>;
-                          // print(doc.id);
-                          // print(data);
-                          return Post(
-                            postID: data['id'],
-                            title: data['title'],
-                            imageUrl: (data['url'] == "") ? "" : data['url'],
 
-                            subtitle: data['subtitle'],
+                    return Post(
+                      postID: data['id'],
+                      title: data['title'],
+                      imageUrl: (data['url'] == "") ? "" : data['url'],
 
-                            userID: data['userID'],
-                            showComments: false,
-                            onBack: reload,
-                            // continue with the other properties you defined in the Post class
-                          );
-                        },
-                      ),
+                      subtitle: data['subtitle'],
+
+                      userID: data['userID'],
+                      showComments: false,
+                      onBack: reload,
+                      // continue with the other properties you defined in the Post class
                     );
-                  }),
+                  },
+                ),
+              ) : Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: CircularProgressIndicator(),
+              ),
             ],
           )
         ));

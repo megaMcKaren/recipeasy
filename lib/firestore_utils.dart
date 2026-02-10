@@ -12,6 +12,22 @@ import 'components/widget_tile.dart';
 class FirestoreUtils {
   static final _db = FirebaseFirestore.instance;
 
+  static Future<String> pickImg() async {
+
+    try {
+      var pickedImg = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+      if (pickedImg != null) {
+        final String imageUrl = await FirestoreUtils.uploadImgToDb(pickedImg);
+
+        return imageUrl;
+      }
+    } catch (error) {
+      print("pickImg: $error");
+    }
+    return "";
+  }
+
   static Future<void> deletePost(String postID) async {
     try {
       await FirebaseFirestore.instance

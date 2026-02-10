@@ -51,7 +51,7 @@ class _FollowPageState extends State<FollowPage> {
                       FollowList(type:"followers",data:data), // Left Side
                       Column(
                         children: [
-                          Container(color: Color(0xFFFF6666), width: 7, height: MediaQuery.of(context).size.height - 115), // Mid Line
+                          Container(color: Color(0xFFFF6666), width: 7, height: MediaQuery.of(context).size.height - 118), // Mid Line
                         ],
                       ),
                       FollowList(type:"following",data:data), // Right Side
