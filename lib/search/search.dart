@@ -28,12 +28,17 @@ class _SearchPageState extends State<SearchPage> {
 
   final TextEditingController searchController = TextEditingController();
 
+  void filterByKeyword(String keyword) async {
+
+  }
+
   void searchFirestore(String searchKey) async {
     // searchKey = searchKey.toLowerCase();
     QuerySnapshot abc = await db.collection("posts")
       .where("title", isGreaterThanOrEqualTo: searchKey)
       .where("title", isLessThanOrEqualTo: '$searchKey\uf8ff')
       .get();
+
     final data = abc.docs.map(
       (doc) {
         final a = doc.data() as Map<String, dynamic>;

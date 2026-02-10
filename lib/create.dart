@@ -89,6 +89,17 @@ class _CreatePageState extends State<CreatePage> {
 
   void CreatePost(dynamic goTo) async {
     try {
+      List<String> tags = [];
+      for (int i = 0; i < tagStates.length; i++) {
+        if (tagStates[i]) {
+          tags.add(Tags.tags[i]);
+        }
+      }
+
+      List<String> keywords = [];
+
+      keywords.addAll(titleController.text.toLowerCase().split(' '));
+      keywords.addAll(subtitleController.text.toLowerCase().split(' '));
       print(addedWidgets);
       final postData = <String, dynamic>{
         "dateCreated": DateTime.now(),
@@ -100,8 +111,8 @@ class _CreatePageState extends State<CreatePage> {
         "dislikes": 0,
         "comments": [],
         "widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),
-        "keywords": [],
-        "tags": tagStates,
+        "keywords": keywords,
+        "tags": tags,
       };
       if (!(goTo == null)) {
         Navigator.pushAndRemoveUntil(

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:social_media_app/welcome.dart';
 import 'home.dart';
 import 'sign_up.dart';
 import 'firebase_options.dart';
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // Ternary operator (?)
       // (condition) ? true stuff : false stuff
-      home: (signedIn) ? HomeScreen() : SignUp(),
+      home: (signedIn) ? HomeScreen() : WelcomePage(),
     );
   }
 }

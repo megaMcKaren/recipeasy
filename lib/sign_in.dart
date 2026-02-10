@@ -19,7 +19,7 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-          color: const Color(0xFF123456),
+          color: const Color(0xFFCDCDFF),
           child: Center(
               child: Container(
                   decoration: BoxDecoration(

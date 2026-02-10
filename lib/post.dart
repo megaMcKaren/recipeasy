@@ -225,11 +225,14 @@ class _PostState extends State<Post> {
                                           }
                                         }
                                       },
-                                      child: Text(
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 25),
-                                          widget.title),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 10, right: 10),
+                                        child: Text(
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 25),
+                                            widget.title),
+                                      ),
                                     ) : SizedBox(
                                       width: 350,
                                       child: TextField(
