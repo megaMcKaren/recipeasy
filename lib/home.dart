@@ -126,19 +126,6 @@ class _HomeScreenState extends State<HomeScreen>  with RouteAware {
                 ListTile(
                   leading: const SizedBox(
                     width: 35,
-                    child: Icon(Icons.build_circle),
-                  ),
-                  title: const Text("Testing"),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfilePage(userID: "test")));
-                  },
-                ),
-                ListTile(
-                  leading: const SizedBox(
-                    width: 35,
                     child: Icon(Icons.add_circle),
                   ),
                   title: const Text("Create"),

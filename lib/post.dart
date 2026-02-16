@@ -355,7 +355,25 @@ class _PostState extends State<Post> {
                               textSize: 15,
                               isCol: true,
                               userID: widget.userID),
-                          // Profile Picture of Post Creator
+                          // Profile Picture of Post Creator'
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: GridView.builder(
+                                shrinkWrap: true,
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 5,
+                                    mainAxisExtent: 60,
+                                ),
+                                itemCount: data["tags"].length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(decoration: BoxDecoration(color: Colors.lightBlueAccent, borderRadius: BorderRadius.circular(15)), child: Center(child: Text(data["tags"][index]))),
+                                  );
+                                }
+                            ),
+                          ),
 
                           GestureDetector(onTap: () async {
                             if (!widget.showComments) {
@@ -367,7 +385,6 @@ class _PostState extends State<Post> {
                                     subtitle: widget.subtitle,
                                     userID: widget.userID,)));
                               if (result == 'refresh') {
-                                print("did it work");
                                 widget.onBack();
                               }
                             }
@@ -398,7 +415,8 @@ class _PostState extends State<Post> {
 
                           SizedBox(height: 10),
 
-                          (widget.showComments) ? ListView.builder(
+                          (widget.showComments)
+                              ? ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: data["widgets"].length,
@@ -476,8 +494,8 @@ class _PostState extends State<Post> {
                               }
                               return Align(alignment: Alignment.center, child: Text("Test"));
                             }
-                          ): SizedBox(),
-
+                          )
+                              : SizedBox(),
 
                           Container(
                             color: Color(0xFFFFFAFA),

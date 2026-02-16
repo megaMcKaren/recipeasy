@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'components/custom_button.dart';
 import 'sign_up.dart';
 import 'home.dart';
 
@@ -65,8 +66,9 @@ class _SignInState extends State<SignIn> {
                               //   return null;
                               // },
                             ),
-                            SizedBox(height: 10),
-                            ElevatedButton(
+                            SizedBox(height: 15),
+
+                            CustomButton(
                               onPressed: () {
                                 try {
                                   FirebaseAuth.instance
@@ -91,17 +93,27 @@ class _SignInState extends State<SignIn> {
                                   }
                                 }
                               },
-                              child: const Text('Log in'),
+                              width: 120,
+                              height: 40,
+                              text: const Text('Log in'),
+                              icon: null,
+                              backgroundColor: Color(0xFFDEDEFF),
                             ),
-                            SizedBox(height: 10),
-                            ElevatedButton(
+
+                            SizedBox(height: 15),
+
+                            CustomButton(
                               onPressed: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => SignUp()));
                               },
-                              child: const Text("Don't have an account"),
+                              width: 210,
+                              height: 40,
+                              text: const Text('Make a new account'),
+                              icon: null,
+                              backgroundColor: Color(0xFFDEDEFF),
                             ),
                           ],
                         ),

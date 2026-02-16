@@ -53,7 +53,7 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-          color: const Color(0xFF123456),
+          color: const Color(0xFFCDCDFF),
           child: Center(
               child: Container(
                   decoration: BoxDecoration(
@@ -111,7 +111,7 @@ class _SignUpState extends State<SignUp> {
                               //   return null;
                               // },
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 15),
                             CustomButton(
                               onPressed: () async {
                                 if (await CreateUser()) {
@@ -123,20 +123,25 @@ class _SignUpState extends State<SignUp> {
                                 }
                               },
                               width: 100,
-                              height: 50,
+                              height: 40,
                               text: const Text('Submit'),
                               icon: null,
+                              backgroundColor: Color(0xFFDEDEFF),
                             ),
-                            SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: () {
+                            SizedBox(height: 15),
+                            CustomButton(
+                              onPressed: () async {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
                                         const SignIn()));
                               },
-                              child: const Text('Already have an account'),
+                              width: 210,
+                              height: 40,
+                              text: const Text('Already have an account'),
+                              icon: null,
+                              backgroundColor: Color(0xFFDEDEFF),
                             ),
                           ],
                         ),

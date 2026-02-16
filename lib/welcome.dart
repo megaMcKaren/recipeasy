@@ -28,13 +28,13 @@ class _WelcomePageState extends State<WelcomePage> {
             ]
           ),
 
-          SizedBox(height: 10),
+          SizedBox(height: 20),
 
-          CustomButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_) => const SignUp()));}, width: MediaQuery.of(context).size.width * 0.7, height: 30, text: Text("Create an Account"), icon: Icon(Icons.hdr_plus)),
+          CustomButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_) => const SignUp()));}, width: MediaQuery.of(context).size.width * 0.7, height: 35, text: Text("Create an Account"), icon: Icon(Icons.add)),
 
-          SizedBox(height: 10),
+          SizedBox(height: 15),
 
-          CustomButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_) => const SignIn()));}, width: MediaQuery.of(context).size.width * 0.7, height: 30, text: Text("Login to an Existing Account"), icon: Icon(Icons.login)),
+          CustomButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_) => const SignIn()));}, width: MediaQuery.of(context).size.width * 0.7, height: 35, text: Text("Login to an Existing Account"), icon: Icon(Icons.login)),
         ],
       )
     );

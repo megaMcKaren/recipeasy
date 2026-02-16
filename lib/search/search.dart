@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:social_media_app/components/custom_button.dart';
+import '../firestore_utils.dart';
 import '../post.dart';
 import '../profile/profile.dart';
 import '../constants/tags.dart';
@@ -28,11 +29,104 @@ class _SearchPageState extends State<SearchPage> {
 
   final TextEditingController searchController = TextEditingController();
 
-  void filterByKeyword(String keyword) async {
+  void filterByKeywordAndTag(String keyword, List<bool> searchTags) async {
+    keyword = keyword.toLowerCase();
+    bool noTagsSelected = searchTags.every((item) => item == false);
+    var tags = Tags.tags
+        .where((item) => searchTags[Tags.tags.indexOf(item)])
+        .map((item) => item.toLowerCase())
+        .toList();
+    print(tags);
+    try {
 
+      QuerySnapshot abc = await db.collection("posts")
+          .where("keywords", arrayContains: keyword)
+          .get();
+      final list1 = abc.docs.map(
+              (doc) {
+            final a = doc.data() as Map<String, dynamic>;
+            a['id'] = doc.id;
+            return a;
+          }
+      ).toList();
+
+      QuerySnapshot def = await db.collection("posts")
+          .where("lcTitle", isGreaterThanOrEqualTo: keyword)
+          .where("lcTitle", isLessThanOrEqualTo: '$keyword\uf8ff')
+          .get();
+      final list2 = def.docs.map(
+              (doc) {
+            final a = doc.data() as Map<String, dynamic>;
+            a['id'] = doc.id;
+            return a;
+          }
+      ).toList();
+
+      var data = {...list1, ...list2}.toList();
+
+      final seenIds = <String>{};
+
+      data = data.where((post) {
+        return seenIds.add(post['id']);
+      }).toList();
+
+      print("BEFORE FILTERING BY TAG --> $data");
+
+      if (tags.isNotEmpty) {
+        QuerySnapshot ghi = await db.collection("posts")
+            .where('tags', arrayContainsAny: tags)
+            .get();
+        final list3 = ghi.docs.map(
+                (doc) {
+              final a = doc.data() as Map<String, dynamic>;
+              a['id'] = doc.id;
+              return a;
+            }
+        ).toList();
+
+        print("LIST3 WHILE FILTERING --> $list3");
+
+        final ids = list3.map((item) => item["id"]).toSet();
+
+        print("ids WHILE FILTERING --> $ids");
+
+        data = data.where((item) => ids.contains(item["id"])).toList();
+
+      }
+
+
+      print("AFTER FILTERING BY TAG --> $data");
+
+      setState(() {
+        posts = data;
+      });
+    } catch (error) {
+      print("$tags Error filtering posts by search keyword $error");
+    }
+  } // You search and it uses this
+
+  void filterByTags(Map<String, dynamic> data, List<String> filters) async {
+    print(FirestoreUtils.isSubset(data["tags"], filters));
+  }
+
+  Future<List<DocumentSnapshot>> getDocsByMultipleTags(List<String> searchTags) async {
+    // 1. Reference your collection
+    CollectionReference collection = FirebaseFirestore.instance.collection('your_collection_name');
+
+    // 2. Query using arrayContainsAny
+    // This returns docs where the 'tag' field contains ANY value in searchTags
+    QuerySnapshot querySnapshot = await collection
+        .where('tag', arrayContainsAny: searchTags)
+        .get();
+
+    return querySnapshot.docs;
   }
 
   void searchFirestore(String searchKey) async {
+
+  }
+
+  void searchByTitle(String searchKey) async {
     // searchKey = searchKey.toLowerCase();
     QuerySnapshot abc = await db.collection("posts")
       .where("title", isGreaterThanOrEqualTo: searchKey)
@@ -114,8 +208,7 @@ class _SearchPageState extends State<SearchPage> {
                   children: [
                     Expanded(child: TextField(controller: searchController, decoration: InputDecoration(hintText: "Search up a recipe!", border: OutlineInputBorder(borderRadius: BorderRadius.circular(50))), textAlign: TextAlign.left)),
                     IconButton(onPressed: () {
-                      print(searchController.text);
-                      searchFirestore(searchController.text);
+                      filterByKeywordAndTag(searchController.text, tagStates);
                     }, icon: Icon(Icons.search, size: 20)),
                   ],
                 ),
@@ -188,10 +281,6 @@ class _SearchPageState extends State<SearchPage> {
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
                     final data = posts[index];
-
-                    // final data = doc.data() as Map<String, dynamic>;
-                    // print(doc.id);
-                    print(data);
 
 
 

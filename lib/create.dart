@@ -92,7 +92,7 @@ class _CreatePageState extends State<CreatePage> {
       List<String> tags = [];
       for (int i = 0; i < tagStates.length; i++) {
         if (tagStates[i]) {
-          tags.add(Tags.tags[i]);
+          tags.add(Tags.tags[i].toLowerCase());
         }
       }
 
@@ -100,6 +100,7 @@ class _CreatePageState extends State<CreatePage> {
 
       keywords.addAll(titleController.text.toLowerCase().split(' '));
       keywords.addAll(subtitleController.text.toLowerCase().split(' '));
+      keywords.addAll(tags);
       print(addedWidgets);
       final postData = <String, dynamic>{
         "dateCreated": DateTime.now(),
@@ -113,6 +114,7 @@ class _CreatePageState extends State<CreatePage> {
         "widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),
         "keywords": keywords,
         "tags": tags,
+        "lcTitle": titleController.text.toLowerCase(),
       };
       if (!(goTo == null)) {
         Navigator.pushAndRemoveUntil(
@@ -133,11 +135,14 @@ class _CreatePageState extends State<CreatePage> {
   @override
   void initState() {
     super.initState();
+
     if (widget.postData.isNotEmpty) {
       titleController.text = widget.postData["title"];
       subtitleController.text = widget.postData["subtitle"];
       postUrl = widget.postData["url"];
       addedWidgets = FirestoreUtils.mapListToWidgetTiles(widget.postData["widgets"], deleteAddedWidget);
+      Set<dynamic> tagsSet = widget.postData["tags"].toSet();
+      tagStates = Tags.tags.map((tag) => tagsSet.contains(tag[0].toUpperCase() + tag.substring(1))).toList();
     }
 
   }
@@ -191,7 +196,7 @@ class _CreatePageState extends State<CreatePage> {
                   ),
                 ]
               ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
 
           Text("Filters", style: GoogleFonts.fanwoodText(fontSize: 20)),
           IconButton(onPressed: () {
@@ -244,7 +249,7 @@ class _CreatePageState extends State<CreatePage> {
                   );
                 }
             );
-          }, icon: Icon(Icons.filter_list)),
+          }, icon: Icon(Icons.filter_list), visualDensity: VisualDensity(vertical: -4.0)),
 
           Padding(padding: EdgeInsets.only(left: 30, right: 30, top: 30), child: Container(
               decoration: BoxDecoration(color: Color(0xFFFDFBFF), borderRadius: BorderRadius.circular(25)),
@@ -348,8 +353,20 @@ class _CreatePageState extends State<CreatePage> {
 
               ) : CustomButton(
                 onPressed: () {
-                  FirestoreUtils.updatePostData({"url": postUrl, "title": titleController.text,"subtitle": subtitleController.text,"widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),}, widget.postID);
+                  List<String> tags = [];
+                  for (int i = 0; i < tagStates.length; i++) {
+                    if (tagStates[i]) {
+                      tags.add(Tags.tags[i].toLowerCase());
+                    }
+                  }
 
+                  List<String> keywords = [];
+
+                  keywords.addAll(titleController.text.toLowerCase().split(' '));
+                  keywords.addAll(subtitleController.text.toLowerCase().split(' '));
+                  keywords.addAll(tags);
+
+                  FirestoreUtils.updatePostData({"tags": tags, "keywords": keywords, "url": postUrl, "title": titleController.text,"subtitle": subtitleController.text,"widgets": FirestoreUtils.widgetTilesToMaps(addedWidgets),}, widget.postID);
 
                   Navigator.pop(context, true);
                   Navigator.of(context).pop();

@@ -25,6 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool editing = false;
   bool editingPfp = false;
+  bool editingBg = false;
 
   Future<DocumentSnapshot> getUserData() {
     // print(FirebaseAuth.instance.currentUser!.uid + " am i string");
@@ -41,6 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String buttonText = "Follow";
   String newPfpUrl = "";
+  String newBgUrl = "";
   Future<void> updateButtonText() async{
     final newText = (await FirestoreUtils.isFollowing(FirebaseAuth.instance.currentUser!.uid, widget.userID)) ? "Unfollow" : "Follow";
     setState(() {
@@ -108,13 +110,58 @@ class _ProfilePageState extends State<ProfilePage> {
             appBar: AppBar(
                 flexibleSpace: Stack(children: [
                   // Image.network(data["bgImg"]),
-                  Align(alignment: AlignmentGeometry.bottomLeft, child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.add_photo_alternate),
+                  (newBgUrl != "")
+                      ? Center(child: Image.network(newBgUrl))
+                      : Center(child: Image.network(data["bgImg"])),
+
+                  Center(child: Container(color: Color(0x55000000), width: 1000, height: 1000)),
+
+                  Align(alignment: AlignmentGeometry.bottomLeft, child: Row(
+                    children: [
+                      IconButton(
+                          onPressed: () async {
+                            newBgUrl =  await FirestoreUtils.pickImg();
+                            setState(() {
+                              editingBg = !editingBg;
+                            });
+                          },
+                          icon: Icon(Icons.add_photo_alternate, color: Colors.white),
+                      ),
+                      (editingBg) ? Row(
+                        children: [
+                          IconButton(
+                            onPressed: () async {
+                              FirestoreUtils.updateUserData(newBgUrl, widget.userID, "bgImg");
+
+                              setState(() {
+                                data["bgImg"] = newBgUrl;
+                                newBgUrl = "";
+                                editingBg = !editingBg;
+                              });
+                            },
+                            icon: const Icon(Icons.check),
+                            color: Colors.white,
+                            iconSize: 22,
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                editingBg = !editingBg;
+                                newBgUrl = "";
+                              });
+
+                            },
+                            icon: const Icon(Icons.delete),
+                            color: Colors.white,
+                            iconSize: 22,
+                          ),
+                        ],
+                      ) : SizedBox()
+                    ],
                   )
                   ),
-                  Center(child: Image.network(data["bgImg"])),
-                  Center(child: Container(color: Color(0x55000000), width: 1000, height: 1000)),
+
+
 
                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                     (editing)

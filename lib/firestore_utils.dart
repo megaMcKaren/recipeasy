@@ -81,6 +81,12 @@ class FirestoreUtils {
     }
   }
 
+  static bool isSubset(List<dynamic> list1, List<dynamic> list2) {
+    final Set<dynamic> set1 = list1.toSet();
+    final Set<dynamic> set2 = list2.toSet();
+    return set2.containsAll(set1);
+  }
+
   static Map<String, dynamic> widgetTileToMap(WidgetTile widgetTile) {
     final data = widgetTile.data;
     switch(widgetTile.data["type"]) {
