@@ -140,8 +140,13 @@ class _CreatePageState extends State<CreatePage> {
       subtitleController.text = widget.postData["subtitle"];
       postUrl = widget.postData["url"];
       addedWidgets = FirestoreUtils.mapListToWidgetTiles(widget.postData["widgets"], deleteAddedWidget);
-      Set<dynamic> tagsSet = widget.postData["tags"].toSet();
-      tagStates = Tags.tags.map((tag) => tagsSet.contains(tag[0].toUpperCase() + tag.substring(1))).toList();
+      for (String tag in widget.postData["tags"]) {
+        String cTag = tag[0].toUpperCase() + tag.substring(1);
+        print(cTag);
+        int index = Tags.tags.indexOf(cTag);
+        tagStates[index] = true;
+      }
+      print(tagStates);
     }
 
   }
@@ -211,36 +216,32 @@ class _CreatePageState extends State<CreatePage> {
                               .center,
                           child: Container(
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
+                                borderRadius: BorderRadius.circular(25),
                                 color: Color(0xFFFAFAFA)
                             ),
-                            width: 375,
-                            height: 405,
-                            child: SizedBox(
-                              width: 200,
-                              height: 200,
-                              child: GridView.builder(
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-                                itemCount: tagStates.length,
-                                itemBuilder: (context, index) {
-                                  final tag = tagStates;
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: CustomButton(
-                                        width: 80,
-                                        height: 40,
-                                        text: Text(style: GoogleFonts.alumniSans(fontSize: 20), Tags.tags[index]),
-                                        icon: null,
-                                        backgroundColor: (tagStates[index]) ? Colors.indigo: Colors.blue,
-                                        onPressed: () {
-                                          setState(() {
-                                            tagStates[index] = !tagStates[index];
-                                          });
-                                        }),
-                                  );
-                                },
+                            width: 385,
+                            height: 385,
+                            child: GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                              itemCount: tagStates.length,
+                              itemBuilder: (context, index) {
+                                final tag = tagStates;
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 14.0, bottom: 14.0),
+                                  child: CustomButton(
+                                      width: 80,
+                                      height: 40,
+                                      text: Text(style: GoogleFonts.alumniSans(fontSize: 20), Tags.tags[index]),
+                                      icon: null,
+                                      backgroundColor: (tagStates[index]) ? Colors.indigo: Colors.blue,
+                                      onPressed: () {
+                                        setState(() {
+                                          tagStates[index] = !tagStates[index];
+                                        });
+                                      }),
+                                );
+                              },
 
-                              ),
                             ),
                           )
                       );
