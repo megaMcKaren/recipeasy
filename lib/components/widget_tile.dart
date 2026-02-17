@@ -75,7 +75,6 @@ class _WidgetTileState extends State<WidgetTile> {
   }
   // XFile? imageFile;
   Widget imagePicker() {
-    print(widget.data["imageUrl"]);
     // final data = widget.data;
 
     void pickImg() async {
@@ -88,8 +87,6 @@ class _WidgetTileState extends State<WidgetTile> {
 
           setState((){
             widget.data["imageUrl"] = imageUrl;
-            // imageFile = pickedImg;
-            // print(imageFile);
           });
         }
       } catch (error) {
@@ -215,7 +212,6 @@ class _WidgetTileState extends State<WidgetTile> {
     descriptionController.addListener(() async {
       widget.data["text"] = descriptionController.text;
     });
-    print("${widget.data}    26y234623gagasgsggaga");
     return Padding(padding: EdgeInsets.all(20), child: TextField(
         textAlign: TextAlign.center,
         controller: descriptionController,

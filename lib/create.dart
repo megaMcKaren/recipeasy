@@ -142,11 +142,9 @@ class _CreatePageState extends State<CreatePage> {
       addedWidgets = FirestoreUtils.mapListToWidgetTiles(widget.postData["widgets"], deleteAddedWidget);
       for (String tag in widget.postData["tags"]) {
         String cTag = tag[0].toUpperCase() + tag.substring(1);
-        print(cTag);
         int index = Tags.tags.indexOf(cTag);
         tagStates[index] = true;
       }
-      print(tagStates);
     }
 
   }
