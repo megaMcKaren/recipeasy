@@ -357,19 +357,21 @@ class _PostState extends State<Post> {
                               userID: widget.userID),
                           // Profile Picture of Post Creator'
 
+                          SizedBox(height: 5),
+
                           SizedBox(
                             width: double.infinity,
                             child: GridView.builder(
                                 shrinkWrap: true,
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 5,
-                                    mainAxisExtent: 60,
+                                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                                    maxCrossAxisExtent: 130,
+                                    mainAxisExtent: 60
                                 ),
                                 itemCount: data["tags"].length,
                                 itemBuilder: (context, index) {
                                   return Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Container(decoration: BoxDecoration(color: Colors.lightBlueAccent, borderRadius: BorderRadius.circular(15)), child: Center(child: Text(data["tags"][index]))),
+                                    child: Container(decoration: BoxDecoration(color: Color(0xFFFAFAFF), borderRadius: BorderRadius.circular(15)), child: Center(child: Text(data["tags"][index]))),
                                   );
                                 }
                             ),

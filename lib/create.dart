@@ -77,7 +77,6 @@ class _CreatePageState extends State<CreatePage> {
 
         setState((){
           postUrl = imageUrl;
-          print("CHANGED");
           // imageFile = pickedImg;
           // print(imageFile);
         });

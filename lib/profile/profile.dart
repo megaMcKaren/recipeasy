@@ -118,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   Align(alignment: AlignmentGeometry.bottomLeft, child: Row(
                     children: [
-                      IconButton(
+                      (signedInUserProfile) ? IconButton(
                           onPressed: () async {
                             newBgUrl =  await FirestoreUtils.pickImg();
                             setState(() {
@@ -126,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             });
                           },
                           icon: Icon(Icons.add_photo_alternate, color: Colors.white),
-                      ),
+                      ) : SizedBox(),
                       (editingBg) ? Row(
                         children: [
                           IconButton(
