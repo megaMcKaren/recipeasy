@@ -63,14 +63,10 @@ class _SearchPageState extends State<SearchPage> {
       ).toList();
 
       var data = {...list1, ...list2}.toList();
-
       final seenIds = <String>{};
-
       data = data.where((post) {
         return seenIds.add(post['id']);
       }).toList();
-
-      print("BEFORE FILTERING BY TAG --> $data");
 
       if (tags.isNotEmpty) {
         QuerySnapshot ghi = await db.collection("posts")
@@ -84,18 +80,9 @@ class _SearchPageState extends State<SearchPage> {
             }
         ).toList();
 
-        print("LIST3 WHILE FILTERING --> $list3");
-
         final ids = list3.map((item) => item["id"]).toSet();
-
-        print("ids WHILE FILTERING --> $ids");
-
         data = data.where((item) => ids.contains(item["id"])).toList();
-
       }
-
-
-      print("AFTER FILTERING BY TAG --> $data");
 
       setState(() {
         posts = data;

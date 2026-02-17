@@ -25,23 +25,11 @@ class WidgetTile extends StatefulWidget {
   int index;
   final Map<String, dynamic> data;
 
-
   @override
   State<WidgetTile> createState() => _WidgetTileState();
 }
 
 class _WidgetTileState extends State<WidgetTile> {
-
-  // late final data = widget.data;
-  //
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   data["imgUrl"] = ""; // what if its a list
-  // }
-
-
-
 
   @override
   Widget build(BuildContext context) { // stack?
